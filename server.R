@@ -10,7 +10,7 @@ library(dplyr)
 
 #source("data-processing.R")
 pd <- idata$total_mmet
-scdata <- NULL
+#scdata <- NULL
 pdl <- NULL
 
 shinyServer(function(input, output, session){
@@ -92,14 +92,23 @@ shinyServer(function(input, output, session){
 #       data <- subset(data, MS == lMS)# & TDR == lTDR & equity == lEQ & ebike == lEB)
     if (lTDR != "All")
       data <- subset(data, TDR == lTDR)
-    
-    data <- subset(data, equity == lEQ)
-    data <- subset(data, ebike == lEB)
+    if (lEQ != "All")
+      data <- subset(data, equity == lEQ)
+    if (lEB != "All")
+      data <- subset(data, ebike == lEB)
     
     data[is.na(data)] <- 0
     data <- arrange(data, MS)
     # data[order(Age),]
     scdata <<- data
+  })
+
+  reactiveFunction <- reactive({
+  
+    lTDR <- input$inTDR
+    lEB <- input$inEB
+    lEQ <- input$inEQ
+    
   })
   
   #   Solid
@@ -115,109 +124,159 @@ shinyServer(function(input, output, session){
   #   LongDashDotDot
   
   genericPlot <- function(var){
+#     reactiveFunction()
+#     cat("start", nrow(scdata), "\n")
+#     if (!is.null(sdata)){}
+#     cat(input$inTDR,  " : ", input$inEB, " : ", input$inEQ, "\n")
     #if (input$inTDR == "All" & input$inMS == "All"){
-#       lTDR <- reactive({input$inTDR})
-#       lEB <- reactive({input$inEB})
-#       lEQ <- reactive({input$inEQ})
-      # cat("MS: ", sort(unique(sdata$MS), decreasing = F)[-1], "\n")
-      lTDR <- input$inTDR
-      lEB <- input$inEB
-      lEQ <- input$inEQ
+#     input$inTDR
+#     input$inEB
+#     input$inEQ
+    
+    h1 <- Highcharts$new()
+    h1$chart(type = "spline")
+    # types of charts: http://api.highcharts.com/highcharts#plotOptions
+    h1$yAxis(title = list(text = var))
+    h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
+    
+    if (input$inTDR == "All"){                 # & input$inEB == "All" & input$inEQ == "All"){
+      if (input$inEB != "All" & input$inEQ != "All"){
+        sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(input$inEB) & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB ", input$inEB, " and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.8 & ebike == as.numeric(input$inEB) & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EB ", input$inEB, " and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.9 & ebike == as.numeric(input$inEB) & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EB ", input$inEB, " and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 1.0 & ebike == as.numeric(input$inEB) & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", input$inEB, " and EQ ", input$inEQ, ")" , sep = ""))
+      }
       
-      h1 <- Highcharts$new()
-      h1$chart(type = "spline")
-      # types of charts: http://api.highcharts.com/highcharts#plotOptions
-      h1$yAxis(title = list(text = var))
-      #h1$xAxis(title = list(text = '# of Scenarios'))
-      #if (input$inEQ != "All" & input$inEB != "All"){
-      h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
+      if (input$inEB == "All" & input$inEQ != "All"){
+        sub1 <- subset(scdata, TDR == 0.7 & ebike == 0 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB 0 and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.7 & ebike == 1 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB 1 and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.8 & ebike == 0 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EB 0 and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.8 & ebike == 1 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EB 1 and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.9 & ebike == 0 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EB 0 and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.9 & ebike == 1 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EB 1 and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 1.0 & ebike == 0 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB 0 and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == 1.0 & ebike == 1 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB 1 and EQ ", input$inEQ, ")" , sep = ""))
+      }
       
-      if (lTDR == "All"){# & lEB == "All" & lEQ == "All"){
-
-          sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
-          h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB ", lEB, " and EQ ", lEQ, ")" , sep = ""))
-          sub1 <- subset(scdata, TDR == 0.8 & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
-          h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EB ", lEB, " and EQ ", lEQ, ")" , sep = ""))
-          sub1 <- subset(scdata, TDR == 0.9 & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
-          h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EB ", lEB, " and EQ ", lEQ, ")" , sep = ""))
-          sub1 <- subset(scdata, TDR == 1.0 & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
-          h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", lEB, " and EQ ", lEQ, ")" , sep = ""))
-          
-#           sub1 <- subset(scdata, TDR == 0.7 & equity == as.numeric(lEQ))
-#           h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EQ ", lEQ, ")", sep = ""))
-#           sub1 <- subset(scdata, TDR == 0.8 & equity == as.numeric(lEQ))
-#           h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EQ ", lEQ, ")", sep = ""))
-#           sub1 <- subset(scdata, TDR == 0.9 & equity == as.numeric(lEQ))
-#           h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EQ ", lEQ, ")", sep = ""))
-#           sub1 <- subset(scdata, TDR == 1.0 & equity == as.numeric(lEQ))
-#           h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EQ ", lEQ, ")", sep = ""))
-          
-          
-#           sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(lEB) & equity == 0)
-#           h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EQ 0 and EB ", lEB, ")", sep = ""))
-#           sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(lEB) & equity == 1)
-#           h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EQ 1 and EB ", lEB, ")", sep = ""))
-#           sub1 <- subset(scdata, TDR == 0.8 & ebike == as.numeric(lEB) & equity == 0)
-#           h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EQ 0 and EB ", lEB, ")", sep = ""))
-#           sub1 <- subset(scdata, TDR == 0.8 & ebike == as.numeric(lEB) & equity == 1)
-#           h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EQ 1 and EB ", lEB, ")", sep = ""))
-          
-      }else{
+      
+      if (input$inEB != "All" & input$inEQ == "All"){
+        sub1 <- subset(scdata, TDR == 0.7 & equity == 0 & ebike == as.numeric(input$inEB))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB ", input$inEB, " and EQ 0)" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.7 & equity == 1 & ebike == as.numeric(input$inEB))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB ", input$inEB, " and EQ 1)" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.8 & equity == 0 & ebike == as.numeric(input$inEB))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EB", input$inEB, " and EQ 0)" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.8 & equity == 1 & ebike == as.numeric(input$inEB))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EB ", input$inEB, " and EQ 1)" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.9 & equity == 0 & ebike == as.numeric(input$inEB))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EB ", input$inEB, " and EQ 0)" , sep = ""))
+        sub1 <- subset(scdata, TDR == 0.9 & equity == 1 & ebike == as.numeric(input$inEB))
+        h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EB ", input$inEB, " and EQ 1)" , sep = ""))
+        sub1 <- subset(scdata, TDR == 1.0 & equity == 0 & ebike == as.numeric(input$inEB))
+        h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", input$inEB, "and EQ 0)" , sep = ""))
+        sub1 <- subset(scdata, TDR == 1.0 & equity == 1 & ebike == as.numeric(input$inEB))
+        h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", input$inEB, "and EQ 1)" , sep = ""))
+      }
+      
+      if (input$inEB == "All" & input$inEQ == "All"){
+        sub1 <- subset(scdata, TDR == 0.7 & ebike == 0 & equity == 0)
+        h1$series(data = sub1[[var]], name = "TDR 0.7 (EB 0 and EQ 0)")
+        sub1 <- subset(scdata, TDR == 0.7 & ebike == 0 & equity == 1)
+        h1$series(data = sub1[[var]], name = "TDR 0.7 (EB 0 and EQ 1)")
+        sub1 <- subset(scdata, TDR == 0.7 & ebike == 1 & equity == 0)
+        h1$series(data = sub1[[var]], name = "TDR 0.7 (EB 1 and EQ 0)")
+        sub1 <- subset(scdata, TDR == 0.7 & ebike == 1 & equity == 1)
+        h1$series(data = sub1[[var]], name = "TDR 0.7 (EB 1 and EQ 1)")
         
-        sub1 <- subset(scdata, TDR == lTDR & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
-        h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", lEB, " and EQ ", lEQ, ")", sep = ""))
         
-#         sub1 <- subset(scdata, TDR == lTDR & equity == as.numeric(lEQ))
-#         h1$series(data = sub1[[var]], name = paste("TDR ", lTDR, "(EQ ", lEQ, ")", sep = ""))
+        sub1 <- subset(scdata, TDR == 0.8 & ebike == 0 & equity == 0)
+        h1$series(data = sub1[[var]], name = "TDR 0.8 (EB 0 and EQ 0)")
+        sub1 <- subset(scdata, TDR == 0.8 & ebike == 0 & equity == 1)
+        h1$series(data = sub1[[var]], name = "TDR 0.8 (EB 0 and EQ 1)")
+        sub1 <- subset(scdata, TDR == 0.8 & ebike == 1 & equity == 0)
+        h1$series(data = sub1[[var]], name = "TDR 0.8 (EB 1 and EQ 0)")
+        sub1 <- subset(scdata, TDR == 0.8 & ebike == 1 & equity == 1)
+        h1$series(data = sub1[[var]], name = "TDR 0.8 (EB 1 and EQ 1)")
+        
+        sub1 <- subset(scdata, TDR == 0.9 & ebike == 0 & equity == 0)
+        h1$series(data = sub1[[var]], name = "TDR 0.9 (EB 0 and EQ 0)")
+        sub1 <- subset(scdata, TDR == 0.9 & ebike == 0 & equity == 1)
+        h1$series(data = sub1[[var]], name = "TDR 0.9 (EB 0 and EQ 1)")
+        sub1 <- subset(scdata, TDR == 0.9 & ebike == 1 & equity == 0)
+        h1$series(data = sub1[[var]], name = "TDR 0.9 (EB 1 and EQ 0)")
+        sub1 <- subset(scdata, TDR == 0.9 & ebike == 1 & equity == 1)
+        h1$series(data = sub1[[var]], name = "TDR 0.9 (EB 1 and EQ 1)")
+        
+        sub1 <- subset(scdata, TDR == 1.0 & ebike == 0 & equity == 0)
+        h1$series(data = sub1[[var]], name = "TDR 1.0 (EB 0 and EQ 0)")
+        sub1 <- subset(scdata, TDR == 1.0 & ebike == 0 & equity == 1)
+        h1$series(data = sub1[[var]], name = "TDR 1.0 (EB 0 and EQ 1)")
+        sub1 <- subset(scdata, TDR == 1.0 & ebike == 1 & equity == 0)
+        h1$series(data = sub1[[var]], name = "TDR 1.0 (EB 1 and EQ 0)")
+        sub1 <- subset(scdata, TDR == 1.0 & ebike == 1 & equity == 1)
+        h1$series(data = sub1[[var]], name = "TDR 1.0 (EB 1 and EQ 1)")
+        
         
       }
       
-#       
-# #       sub1 <- subset(scdata, TDR == 0.7)
-# #       h1$series(data = sub1[[var]], name = "TDR 0.7")
-#       sub1 <- subset(scdata, TDR == 0.7 & ebike == 0)
-#       h1$series(data = sub1[[var]], name = "TDR 0.7 (EB 0)")
-#       sub1 <- subset(scdata, TDR == 0.7 & ebike == 1)
-#       h1$series(data = sub1[[var]], name = "TDR 0.7 (EB 1)")
-# #       sub1 <- subset(scdata, TDR == 0.8)
-# #       h1$series(data = sub1[[var]], name = "TDR 0.8")
-#       sub1 <- subset(scdata, TDR == 0.8 & ebike == 0)
-#       h1$series(data = sub1[[var]], name = "TDR 0.8 (EB 0)")
-#       sub1 <- subset(scdata, TDR == 0.8 & ebike == 1)
-#       h1$series(data = sub1[[var]], name = "TDR 0.8 (EB 1)")
-# #       sub1 <- subset(scdata, TDR == 0.9)
-# #       h1$series(data = sub1[[var]], name = "TDR 0.9")
-#       sub1 <- subset(scdata, TDR == 0.9 & ebike == 0)
-#       h1$series(data = sub1[[var]], name = "TDR 0.9 (EB 0)")
-#       sub1 <- subset(scdata, TDR == 0.9 & ebike == 1)
-#       h1$series(data = sub1[[var]], name = "TDR 0.9 (EB 1)")
-# #       sub1 <- subset(scdata, TDR == 1.0)
-# #       h1$series(data = sub1[[var]], name = "TDR 1.0")
-#       sub1 <- subset(scdata, TDR == 1.0  & ebike == 0)
-#       h1$series(data = sub1[[var]], name = "TDR 1.0 (EB 0)")
-#       sub1 <- subset(scdata, TDR == 1.0 & ebike == 1)
-#       h1$series(data = sub1[[var]], name = "TDR 1.0 (EB 1)")
-#       
-#       h1$exporting(enabled = T)
-#       #h1$show('inline', include_assets = TRUE, cdn = TRUE)
-#       #       h1$tooltip( formatter = "#! function() { return 'x: '     + this.point.x +
-#       #                                                 'y: '    + this.point.y  +
-#       #                                                 'name: '  + this.point.group; } !#")
-#       #h1$set(dom = 'plotCycPercent')
-#       return(h1)
-#       
-#     }else{
-#       
-#       h1 <- Highcharts$new()
-#       h1$chart(type = "spline")
-#       h1$series(data = scdata[[var]], name = paste("TDR", input$inTDR), dashStyle = "longdash")
-#       h1$yAxis(title = list(text = var))
-#       if (input$inEQ != "All" & input$inEB != "All" & input$inTDR != "All"){
-#         h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
-#       }
-      h1$exporting(enabled = T)
-      return(h1)
-#     }
+      
+      
+    }else{
+      
+      
+      if (input$inEB != "All" & input$inEQ != "All"){
+        sub1 <- subset(scdata, TDR == input$inTDR & ebike == as.numeric(input$inEB) & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB ", input$inEB, " and EQ ", input$inEQ, ")" , sep = ""))
+        
+      }
+      
+      if (input$inEB == "All" & input$inEQ != "All"){
+        sub1 <- subset(scdata, TDR == input$inTDR & ebike == 0 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB 0 and EQ ", input$inEQ, ")" , sep = ""))
+        sub1 <- subset(scdata, TDR == input$inTDR & ebike == 1 & equity == as.numeric(input$inEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB 1 and EQ ", input$inEQ, ")" , sep = ""))
+        
+      }
+      
+      
+      if (input$inEB != "All" & input$inEQ == "All"){
+        sub1 <- subset(scdata, TDR == input$inTDR & equity == 0 & ebike == as.numeric(input$inEB))
+        h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB ", input$inEB, " and EQ 0)" , sep = ""))
+        sub1 <- subset(scdata, TDR == input$inTDR & equity == 1 & ebike == as.numeric(input$inEB))
+        
+      }
+      
+      if (input$inEB == "All" & input$inEQ == "All"){
+        sub1 <- subset(scdata, TDR == input$inTDR & ebike == 0 & equity == 0)
+        h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB 0 and EQ 0)"))
+        sub1 <- subset(scdata, TDR == input$inTDR & ebike == 0 & equity == 1)
+        h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB 0 and EQ 1)"))
+        sub1 <- subset(scdata, TDR == input$inTDR & ebike == 1 & equity == 0)
+        h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB 1 and EQ 0)"))
+        sub1 <- subset(scdata, TDR == input$inTDR & ebike == 1 & equity == 1)
+        h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB 1 and EQ 1)"))
+
+      }
+      
+      
+      
+      
+    }
+    
+    h1$exporting(enabled = T)
+    return(h1)
   }
   
   output$plotCycPercent <- renderChart({
