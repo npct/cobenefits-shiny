@@ -82,20 +82,19 @@ shinyServer(function(input, output, session){
   
   generateScenarioTable<- reactive({
     
-    lMS <- input$inMS
+#     lMS <- input$inMS
     lTDR <- input$inTDR
     lEB <- input$inEB
     lEQ <- input$inEQ
     
     data <- sdata
-    if (lMS != "All")
-      data <- subset(data, MS == lMS)# & TDR == lTDR & equity == lEQ & ebike == lEB)
+#     if (lMS != "All")
+#       data <- subset(data, MS == lMS)# & TDR == lTDR & equity == lEQ & ebike == lEB)
     if (lTDR != "All")
       data <- subset(data, TDR == lTDR)
-    if (lEQ != "All")
-      data <- subset(data, equity == lEQ)
-    if (lEB != "All")
-      data <- subset(data, ebike == lEB)
+    
+    data <- subset(data, equity == lEQ)
+    data <- subset(data, ebike == lEB)
     
     data[is.na(data)] <- 0
     data <- arrange(data, MS)
@@ -116,55 +115,87 @@ shinyServer(function(input, output, session){
   #   LongDashDotDot
   
   genericPlot <- function(var){
-    if (input$inTDR == "All" & input$inMS == "All"){
+    #if (input$inTDR == "All" & input$inMS == "All"){
+#       lTDR <- reactive({input$inTDR})
+#       lEB <- reactive({input$inEB})
+#       lEQ <- reactive({input$inEQ})
+      # cat("MS: ", sort(unique(sdata$MS), decreasing = F)[-1], "\n")
+      lTDR <- input$inTDR
+      lEB <- input$inEB
+      lEQ <- input$inEQ
       
       h1 <- Highcharts$new()
       h1$chart(type = "spline")
       # types of charts: http://api.highcharts.com/highcharts#plotOptions
       h1$yAxis(title = list(text = var))
-      h1$xAxis(title = list(text = '# of Scenarios'))
-      if (input$inEQ != "All" & input$inEB != "All"){
-        h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
+      #h1$xAxis(title = list(text = '# of Scenarios'))
+      #if (input$inEQ != "All" & input$inEB != "All"){
+      h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
+      
+      if (lTDR == "All"){
+
+          sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(lEB))
+          h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB ", lEB, ")", sep = ""))
+          sub1 <- subset(scdata, TDR == 0.8 & ebike == as.numeric(lEB))
+          h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EB ", lEB, ")", sep = ""))
+          sub1 <- subset(scdata, TDR == 0.9 & ebike == as.numeric(lEB))
+          h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EB ", lEB, ")", sep = ""))
+          sub1 <- subset(scdata, TDR == 1.0 & ebike == as.numeric(lEB))
+          h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", lEB, ")", sep = ""))
+          
+      }else{
+        
+        sub1 <- subset(scdata, TDR == lTDR & ebike == as.numeric(lEB))
+        h1$series(data = sub1[[var]], name = paste("TDR ", lTDR, "(EB ", lEB, ")", sep = ""))
+        
       }
       
-      sub1 <- subset(scdata, TDR == 0.7)
-      h1$series(data = sub1[[var]], name = "TDR 0.7")
-      sub1 <- subset(scdata, TDR == 0.8)
-      h1$series(data = sub1[[var]], name = "TDR 0.8")
-      sub1 <- subset(scdata, TDR == 0.9)
-      h1$series(data = sub1[[var]], name = "TDR 0.9")
-      sub1 <- subset(scdata, TDR == 1.0)
-      h1$series(data = sub1[[var]], name = "TDR 1.0")
-      
-      #       sub1 <- subset(scdata, ebike == 0)
-      #       h1$series(data = sub1[[var]], name = "Ebike 0")
-      #       sub1 <- subset(scdata, ebike == 1)
-      #       h1$series(data = sub1[[var]], name = "Ebike 1")
-      #       sub1 <- subset(scdata, equity == 0)
-      #       h1$series(data = sub1[[var]], name = "Equity 0")
-      #       sub1 <- subset(scdata, equity == 1)
-      #       h1$series(data = sub1[[var]], name = "Equity 1")
-      
+#       
+# #       sub1 <- subset(scdata, TDR == 0.7)
+# #       h1$series(data = sub1[[var]], name = "TDR 0.7")
+#       sub1 <- subset(scdata, TDR == 0.7 & ebike == 0)
+#       h1$series(data = sub1[[var]], name = "TDR 0.7 (EB 0)")
+#       sub1 <- subset(scdata, TDR == 0.7 & ebike == 1)
+#       h1$series(data = sub1[[var]], name = "TDR 0.7 (EB 1)")
+# #       sub1 <- subset(scdata, TDR == 0.8)
+# #       h1$series(data = sub1[[var]], name = "TDR 0.8")
+#       sub1 <- subset(scdata, TDR == 0.8 & ebike == 0)
+#       h1$series(data = sub1[[var]], name = "TDR 0.8 (EB 0)")
+#       sub1 <- subset(scdata, TDR == 0.8 & ebike == 1)
+#       h1$series(data = sub1[[var]], name = "TDR 0.8 (EB 1)")
+# #       sub1 <- subset(scdata, TDR == 0.9)
+# #       h1$series(data = sub1[[var]], name = "TDR 0.9")
+#       sub1 <- subset(scdata, TDR == 0.9 & ebike == 0)
+#       h1$series(data = sub1[[var]], name = "TDR 0.9 (EB 0)")
+#       sub1 <- subset(scdata, TDR == 0.9 & ebike == 1)
+#       h1$series(data = sub1[[var]], name = "TDR 0.9 (EB 1)")
+# #       sub1 <- subset(scdata, TDR == 1.0)
+# #       h1$series(data = sub1[[var]], name = "TDR 1.0")
+#       sub1 <- subset(scdata, TDR == 1.0  & ebike == 0)
+#       h1$series(data = sub1[[var]], name = "TDR 1.0 (EB 0)")
+#       sub1 <- subset(scdata, TDR == 1.0 & ebike == 1)
+#       h1$series(data = sub1[[var]], name = "TDR 1.0 (EB 1)")
+#       
+#       h1$exporting(enabled = T)
+#       #h1$show('inline', include_assets = TRUE, cdn = TRUE)
+#       #       h1$tooltip( formatter = "#! function() { return 'x: '     + this.point.x +
+#       #                                                 'y: '    + this.point.y  +
+#       #                                                 'name: '  + this.point.group; } !#")
+#       #h1$set(dom = 'plotCycPercent')
+#       return(h1)
+#       
+#     }else{
+#       
+#       h1 <- Highcharts$new()
+#       h1$chart(type = "spline")
+#       h1$series(data = scdata[[var]], name = paste("TDR", input$inTDR), dashStyle = "longdash")
+#       h1$yAxis(title = list(text = var))
+#       if (input$inEQ != "All" & input$inEB != "All" & input$inTDR != "All"){
+#         h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
+#       }
       h1$exporting(enabled = T)
-      #h1$show('inline', include_assets = TRUE, cdn = TRUE)
-      #       h1$tooltip( formatter = "#! function() { return 'x: '     + this.point.x +
-      #                                                 'y: '    + this.point.y  +
-      #                                                 'name: '  + this.point.group; } !#")
-      #h1$set(dom = 'plotCycPercent')
       return(h1)
-      
-    }else{
-      
-      h1 <- Highcharts$new()
-      h1$chart(type = "spline")
-      h1$series(data = scdata[[var]], name = paste("TDR", input$inTDR), dashStyle = "longdash")
-      h1$yAxis(title = list(text = var))
-      if (input$inEQ != "All" & input$inEB != "All" & input$inTDR != "All"){
-        h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
-      }
-      h1$exporting(enabled = T)
-      return(h1)
-    }
+#     }
   }
   
   output$plotCycPercent <- renderChart({
