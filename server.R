@@ -134,32 +134,41 @@ shinyServer(function(input, output, session){
       
       if (lTDR == "All"){# & lEB == "All" & lEQ == "All"){
 
-          sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(lEB))
-          h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB ", lEB, ")", sep = ""))
-          sub1 <- subset(scdata, TDR == 0.8 & ebike == as.numeric(lEB))
-          h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EB ", lEB, ")", sep = ""))
-          sub1 <- subset(scdata, TDR == 0.9 & ebike == as.numeric(lEB))
-          h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EB ", lEB, ")", sep = ""))
-          sub1 <- subset(scdata, TDR == 1.0 & ebike == as.numeric(lEB))
-          h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", lEB, ")", sep = ""))
+          sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
+          h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB ", lEB, " and EQ ", lEQ, ")" , sep = ""))
+          sub1 <- subset(scdata, TDR == 0.8 & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
+          h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EB ", lEB, " and EQ ", lEQ, ")" , sep = ""))
+          sub1 <- subset(scdata, TDR == 0.9 & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
+          h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EB ", lEB, " and EQ ", lEQ, ")" , sep = ""))
+          sub1 <- subset(scdata, TDR == 1.0 & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
+          h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", lEB, " and EQ ", lEQ, ")" , sep = ""))
           
-          sub1 <- subset(scdata, TDR == 0.7 & equity == as.numeric(lEQ))
-          h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EQ ", lEQ, ")", sep = ""))
-          sub1 <- subset(scdata, TDR == 0.8 & equity == as.numeric(lEQ))
-          h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EQ ", lEQ, ")", sep = ""))
-          sub1 <- subset(scdata, TDR == 0.9 & equity == as.numeric(lEQ))
-          h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EQ ", lEQ, ")", sep = ""))
-          sub1 <- subset(scdata, TDR == 1.0 & equity == as.numeric(lEQ))
-          h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EQ ", lEQ, ")", sep = ""))
+#           sub1 <- subset(scdata, TDR == 0.7 & equity == as.numeric(lEQ))
+#           h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EQ ", lEQ, ")", sep = ""))
+#           sub1 <- subset(scdata, TDR == 0.8 & equity == as.numeric(lEQ))
+#           h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EQ ", lEQ, ")", sep = ""))
+#           sub1 <- subset(scdata, TDR == 0.9 & equity == as.numeric(lEQ))
+#           h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EQ ", lEQ, ")", sep = ""))
+#           sub1 <- subset(scdata, TDR == 1.0 & equity == as.numeric(lEQ))
+#           h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EQ ", lEQ, ")", sep = ""))
           
+          
+#           sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(lEB) & equity == 0)
+#           h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EQ 0 and EB ", lEB, ")", sep = ""))
+#           sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(lEB) & equity == 1)
+#           h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EQ 1 and EB ", lEB, ")", sep = ""))
+#           sub1 <- subset(scdata, TDR == 0.8 & ebike == as.numeric(lEB) & equity == 0)
+#           h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EQ 0 and EB ", lEB, ")", sep = ""))
+#           sub1 <- subset(scdata, TDR == 0.8 & ebike == as.numeric(lEB) & equity == 1)
+#           h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EQ 1 and EB ", lEB, ")", sep = ""))
           
       }else{
         
-        sub1 <- subset(scdata, TDR == lTDR & ebike == as.numeric(lEB))
-        h1$series(data = sub1[[var]], name = paste("TDR ", lTDR, "(EB ", lEB, ")", sep = ""))
+        sub1 <- subset(scdata, TDR == lTDR & ebike == as.numeric(lEB) & equity == as.numeric(lEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", lEB, " and EQ ", lEQ, ")", sep = ""))
         
-        sub1 <- subset(scdata, TDR == lTDR & equity == as.numeric(lEQ))
-        h1$series(data = sub1[[var]], name = paste("TDR ", lTDR, "(EQ ", lEQ, ")", sep = ""))
+#         sub1 <- subset(scdata, TDR == lTDR & equity == as.numeric(lEQ))
+#         h1$series(data = sub1[[var]], name = paste("TDR ", lTDR, "(EQ ", lEQ, ")", sep = ""))
         
       }
       
