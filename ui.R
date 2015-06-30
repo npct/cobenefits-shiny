@@ -49,8 +49,8 @@ shinyUI(pageWithSidebar(
   mainPanel(
     tabsetPanel(
       tabPanel("Scenarios", value=1,
-                showOutput('plotCycPercent', "HighCharts"),
-                showOutput('plotGenericVariable', "HighCharts")
+                showOutput('plotCycPercent', "highcharts"),
+                showOutput('plotGenericVariable', "highcharts")
                 #showOutput('plotCO2R', "HighCharts"),
                 #showOutput('plotCarAccess', "HighCharts")
                ),
