@@ -7,9 +7,9 @@ if (!require(rCharts)) {
 source("data-processing.R")
 uMS <- append("All", sort(unique(sdata$MS))[-1]) # c("0" = "0","1" = "1", "2" = "2", "4" = "4", "8" = "8","16" = "16", "32" = "32", "64" = "64") #as.list(as.character(sort(unique(sdata$MS))))
 uTDR <- append("All", sort(unique(sdata$TDR), decreasing = F)[-1])
-#uEQ <- "All"
+# uEQ <- append("All",sort(unique(sdata$equity)))
 uEQ <- sort(unique(sdata$equity))
-#uEB <- "All"
+# uEB <- append("All", sort(unique(sdata$ebike)))
 uEB <- sort(unique(sdata$ebike))
 variableList <- t(as.matrix(colnames(sdata)))
 variableList <- variableList[,6:72]

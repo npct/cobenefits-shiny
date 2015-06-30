@@ -132,7 +132,7 @@ shinyServer(function(input, output, session){
       #if (input$inEQ != "All" & input$inEB != "All"){
       h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
       
-      if (lTDR == "All"){
+      if (lTDR == "All"){# & lEB == "All" & lEQ == "All"){
 
           sub1 <- subset(scdata, TDR == 0.7 & ebike == as.numeric(lEB))
           h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EB ", lEB, ")", sep = ""))
@@ -143,10 +143,23 @@ shinyServer(function(input, output, session){
           sub1 <- subset(scdata, TDR == 1.0 & ebike == as.numeric(lEB))
           h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EB ", lEB, ")", sep = ""))
           
+          sub1 <- subset(scdata, TDR == 0.7 & equity == as.numeric(lEQ))
+          h1$series(data = sub1[[var]], name = paste("TDR 0.7 (EQ ", lEQ, ")", sep = ""))
+          sub1 <- subset(scdata, TDR == 0.8 & equity == as.numeric(lEQ))
+          h1$series(data = sub1[[var]], name = paste("TDR 0.8 (EQ ", lEQ, ")", sep = ""))
+          sub1 <- subset(scdata, TDR == 0.9 & equity == as.numeric(lEQ))
+          h1$series(data = sub1[[var]], name = paste("TDR 0.9 (EQ ", lEQ, ")", sep = ""))
+          sub1 <- subset(scdata, TDR == 1.0 & equity == as.numeric(lEQ))
+          h1$series(data = sub1[[var]], name = paste("TDR 1.0 (EQ ", lEQ, ")", sep = ""))
+          
+          
       }else{
         
         sub1 <- subset(scdata, TDR == lTDR & ebike == as.numeric(lEB))
         h1$series(data = sub1[[var]], name = paste("TDR ", lTDR, "(EB ", lEB, ")", sep = ""))
+        
+        sub1 <- subset(scdata, TDR == lTDR & equity == as.numeric(lEQ))
+        h1$series(data = sub1[[var]], name = paste("TDR ", lTDR, "(EQ ", lEQ, ")", sep = ""))
         
       }
       
