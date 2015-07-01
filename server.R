@@ -7,6 +7,8 @@ if (!require(rCharts)) {
 }
 library(reshape2)
 library(dplyr)
+library(ggplot2)
+library(plyr)
 
 #source("data-processing.R")
 pd <- idata$total_mmet
@@ -41,12 +43,27 @@ shinyServer(function(input, output, session){
         #         pm$set(dom = 'plotMode')
         #         return(pm)
         
+#         p1 <- nPlot(pd$MainMode_reduced, y = pd$MainMode_reduced_val, data = pd, type = "bar")
+#         p1$set(dom = "plotMode")
+#         return (p1)
         
-        par(mar = c(10, 4, 5, 5) + 0.2)
-        barplot(height=table(pd$MainMode_reduced, pd$MainMode_reduced_val), las=2,
-                cex.names=1, col=1:length(unique(pd$MainMode_reduced)),
-                main = "Mode of Travel (Trip Based Dataset)")
+        
+        bcounts <- count(tdata, "MainMode_reduced_val")
+        
+        bcounts$Baseline_Frequency <- bcounts$freq / sum(bcounts$freq) * 100
+        bcounts$freq <- NULL
+        
+        scounts <- count(pd, "MainMode_reduced_val")
+        scounts$freq1 <- scounts$freq / sum(scounts$freq) * 100
+
+        bcounts$Filtered_Frequency <- scounts$freq1
+        
+        df.long<-melt(bcounts)
+        print(ggplot(df.long,aes(MainMode_reduced_val,value,fill=variable)) + geom_bar(stat="identity",position="dodge") 
+              + labs(x = "", y = "Frequency (%) ") + theme(text = element_text(size = 10)))
+        
       }
+
       else{
         max_val <- max(pd$total_mmet)
         if (max_val < 60){
@@ -67,10 +84,11 @@ shinyServer(function(input, output, session){
     #     plotDataTable()
     if (!is.null(tdata)){
       if (input$scenario == 't'){
-        par(mar = c(10, 4, 5, 5) + 0.2)
-        barplot(height=table(tdata$MainMode_reduced, tdata$MainMode_reduced_val), las=2,
-                cex.names=1, col=1:length(unique(tdata$MainMode_reduced)),
-                main = "Baseline: Mode of Travel")
+#         par(mar = c(10, 4, 5, 5) + 0.2)
+#         
+#         barplot(height=table(tdata$MainMode_reduced, tdata$MainMode_reduced_val), las=2,
+#                 cex.names=1, col=1:length(unique(tdata$MainMode_reduced)),
+#                 main = "Baseline: Mode of Travel")
       }
       else{
         hist(idata$total_mmet, xlab = "Total Marginal MET", main = "Baseline: Total Marginal MET",

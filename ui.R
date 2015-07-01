@@ -56,6 +56,12 @@ shinyUI(pageWithSidebar(
                ),
 
       tabPanel("Baseline", value=2,
+               
+               
+#                div(class='wrapper',
+#                    tags$style(".Nvd3{ height: 400px;}"),
+#                    showOutput("plotMode","Nvd3")
+#                ),
                plotOutput("plotMode"),
                plotOutput("plotBaseline"))
       , id = "conditionedPanels"
