@@ -137,7 +137,8 @@ shinyServer(function(input, output, session){
     h1$chart(type = "spline")
     # types of charts: http://api.highcharts.com/highcharts#plotOptions
     h1$yAxis(title = list(text = var))
-    h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
+    #h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
+    h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F), title = list(text = 'Cycling Multiplier'))
     
     if (input$inTDR == "All"){                 # & input$inEB == "All" & input$inEQ == "All"){
       if (input$inEB != "All" & input$inEQ != "All"){

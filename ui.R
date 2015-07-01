@@ -5,8 +5,10 @@ if (!require(rCharts)) {
   library(rCharts)
 }
 source("data-processing.R")
-uMS <- append("All", sort(unique(sdata$MS))[-1]) # c("0" = "0","1" = "1", "2" = "2", "4" = "4", "8" = "8","16" = "16", "32" = "32", "64" = "64") #as.list(as.character(sort(unique(sdata$MS))))
-uTDR <- append("All", sort(unique(sdata$TDR), decreasing = F)[-1])
+uMS <- append("All", sort(unique(sdata$MS)))
+#uMS <- append("All", sort(unique(sdata$MS))[-1])
+uTDR <- append("All", sort(unique(sdata$TDR), decreasing = F))
+#uTDR <- append("All", sort(unique(sdata$TDR), decreasing = F)[-1])
 uEQ <- append("All",sort(unique(sdata$equity)))
 #uEQ <- sort(unique(sdata$equity))
 uEB <- append("All", sort(unique(sdata$ebike)))
