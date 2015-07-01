@@ -12,7 +12,7 @@ uEQ <- append("All",sort(unique(sdata$equity)))
 uEB <- append("All", sort(unique(sdata$ebike)))
 #uEB <- sort(unique(sdata$ebike))
 variableList <- t(as.matrix(colnames(sdata)))
-variableList <- variableList[,6:72]
+variableList <- variableList[,6:length(colnames(sdata))]
 
 scenarios <- c("Trips" = "t",
                "Individuals" =    "i")
