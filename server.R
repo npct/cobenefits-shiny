@@ -60,7 +60,7 @@ shinyServer(function(input, output, session){
         
         df.long<-melt(bcounts)
         print(ggplot(df.long,aes(MainMode_reduced_val,value,fill=variable)) + geom_bar(stat="identity",position="dodge") 
-              + labs(x = "", y = "Frequency (%) ") + theme(text = element_text(size = 10)))
+              + labs(x = "", y = "Frequency (%) ") + theme(text = element_text(size = 14)))
         
       }
 
