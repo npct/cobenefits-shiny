@@ -72,8 +72,12 @@ shinyServer(function(input, output, session){
         filtered_title <- getFilteredTitle(idata)
         max_val <- max(pd$total_mmet)
         if (max_val < 60){
-          hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""),
-               breaks = c(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet)))
+          if (max_val > 5){
+            hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""),
+                 breaks = c(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet)))
+          }else{
+            hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""))
+          }
         }
         else{
           hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""),
