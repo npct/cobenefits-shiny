@@ -11,9 +11,7 @@ library(ggplot2)
 library(plyr)
 library(stringr)
 
-#source("data-processing.R")
 pd <- idata$total_mmet
-#scdata <- NULL
 pdl <- NULL
 
 shinyServer(function(input, output, session){
@@ -48,15 +46,6 @@ shinyServer(function(input, output, session){
     plotDataTable()
     if (!is.null(pd)){
       if (input$scenario == 't'){
-        #         pm <- rPlot(x = pd$MainMode_reduced, y = pd$MainMode_reduced_val, data = pd, type = "bar") # , y = pd$MainMode_reduced
-        #         pm$set(dom = 'plotMode')
-        #         return(pm)
-        
-#         p1 <- nPlot(pd$MainMode_reduced, y = pd$MainMode_reduced_val, data = pd, type = "bar")
-#         p1$set(dom = "plotMode")
-#         return (p1)
-        
-        
         bcounts <- count(tdata, "MainMode_reduced_val")
         
         bcounts$Baseline_Frequency <- bcounts$freq / sum(bcounts$freq) * 100
@@ -67,8 +56,6 @@ shinyServer(function(input, output, session){
         
         ecounts <- data.frame(v1=bcounts$Baseline_Frequency, Filtered_Frequency=scounts[match(bcounts$MainMode_reduced_val, scounts$MainMode_reduced_val), 3])
 
-        #for ()
-#         bcounts$Filtered_Frequency <- scounts$freq1
         bcounts$Filtered_Frequency <- ecounts$Filtered_Frequency
         
         df.long<-melt(bcounts)
@@ -115,18 +102,6 @@ shinyServer(function(input, output, session){
     
   })
 
-  output$myChart <- renderChart2({
-    plotDataTable()
-    if (!is.null(pd)){
-      #n <- subset(tdata, age_group %in% input$ag)
-      p1 <- nPlot(total_mmet ~ MainMode_reduced_val, group = "age_group", data = pd, type="multiBarChart")
-      #p1$show(static = FALSE)
-      p1$set(dom = 'myChart')
-      return(p1)
-    }
-  })
-  
-  
   output$plotBaseline <- renderPlot({
     #     plotDataTable()
     if (!is.null(tdata)){
@@ -375,4 +350,5 @@ shinyServer(function(input, output, session){
     h$set(dom = 'plotGenericVariable')
     return (h)
   })
+
 })

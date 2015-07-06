@@ -59,19 +59,14 @@ shinyUI(pageWithSidebar(
       tabPanel("Scenarios", value=1,
                 showOutput('plotCycPercent', "highcharts"),
                 showOutput('plotGenericVariable', "highcharts")
-                #showOutput('plotCO2R', "HighCharts"),
-                #showOutput('plotCarAccess', "HighCharts")
                ),
 
       tabPanel("Baseline", value=2,
-               
-               
 #                div(class='wrapper',
 #                    tags$style(".Nvd3{ height: 400px;}"),
 #                    showOutput("plotMode","Nvd3")
 #                ),
                 plotOutput("plotMode"),
-#                 showOutput("myChart", "nvd3"),
                 plotOutput("plotBaseline"))
       , id = "conditionedPanels"
     )
