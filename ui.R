@@ -22,6 +22,12 @@ scenarios <- c("Trips" = "t",
 ag <- "All"
 ag <- append(ag, sort(unique(as.character(tdata$age_group))))
 
+#ses <- append("All", sort(unique(as.character(tdata$NSSec_B03ID))))
+ses <- c("All" = "All", "1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)
+
+#ethnicity <- append("All", sort(unique(as.character(tdata$EthGroupTS_B02ID))))
+ethnicity <- c("All" = "All", "White" = 1, "Non-white" = 2)
+
 gender <- c("All" = 3,
             "Male" = 1,
             "Female" = 2)
@@ -42,7 +48,9 @@ shinyUI(pageWithSidebar(
     conditionalPanel(condition="input.conditionedPanels==2",
                      radioButtons("scenario", "Scenario:", scenarios, inline = TRUE),
                      selectizeInput("ag", "Age Group:", ag, selected = ag[1], multiple = F), #options = list(maxOptions = 2)),
-                     radioButtons("gender", "Gender: ", gender, inline = TRUE)
+                     radioButtons("gender", "Gender: ", gender, inline = TRUE),
+                     selectizeInput("ses", "SES Group:", ses, selected = ses[1], multiple = F),
+                     selectizeInput("ethnicity", "Ethnic Group:", ethnicity, selected = ethnicity[1], multiple = F)
     )
   ),
 
@@ -62,8 +70,9 @@ shinyUI(pageWithSidebar(
 #                    tags$style(".Nvd3{ height: 400px;}"),
 #                    showOutput("plotMode","Nvd3")
 #                ),
-               plotOutput("plotMode"),
-               plotOutput("plotBaseline"))
+                plotOutput("plotMode"),
+#                 showOutput("myChart", "nvd3"),
+                plotOutput("plotBaseline"))
       , id = "conditionedPanels"
     )
   )

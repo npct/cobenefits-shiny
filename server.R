@@ -9,6 +9,7 @@ library(reshape2)
 library(dplyr)
 library(ggplot2)
 library(plyr)
+library(stringr)
 
 #source("data-processing.R")
 pd <- idata$total_mmet
@@ -31,6 +32,14 @@ shinyServer(function(input, output, session){
     }
     if (input$gender != 3)
       data <- subset(data, Sex_B01ID %in% input$gender)
+    
+    if (input$ses != "All"){
+      data <- subset(data, NSSec_B03ID %in% input$ses)
+    }
+    
+    if (input$ethnicity != "All"){
+      data <- subset(data, EthGroupTS_B02ID %in% input$ethnicity)
+    }
     data[is.na(data)] <- 0
     pd <<- data
   })
@@ -55,11 +64,38 @@ shinyServer(function(input, output, session){
         
         scounts <- count(pd, "MainMode_reduced_val")
         scounts$freq1 <- scounts$freq / sum(scounts$freq) * 100
+        
+        ecounts <- data.frame(v1=bcounts$Baseline_Frequency, Filtered_Frequency=scounts[match(bcounts$MainMode_reduced_val, scounts$MainMode_reduced_val), 3])
 
-        bcounts$Filtered_Frequency <- scounts$freq1
+        #for ()
+#         bcounts$Filtered_Frequency <- scounts$freq1
+        bcounts$Filtered_Frequency <- ecounts$Filtered_Frequency
         
         df.long<-melt(bcounts)
-        print(ggplot(df.long,aes(MainMode_reduced_val,value,fill=variable)) + geom_bar(stat="identity",position="dodge") 
+
+        filtered_title <- "Baseline"
+        if (nrow(tdata) != nrow (pd)){
+          
+          displayGender <- "All"
+          if (input$gender == 1){
+            displayGender <- "Male"
+          }else if (input$gender == 2){
+            displayGender <- "Female"
+          }
+          
+          displayEthnicity <- "All"
+          if (input$ethnicity == 1){
+            displayEthnicity <- "White"
+          }else if (input$ethnicity == 2){
+            displayEthnicity <- "Non-White"
+          }
+          
+          
+          filtered_title <- paste("Age Group: ", str_trim(input$ag), ", Gender: ", displayGender, " \n SES: ", input$ses, " and Ethnicity: ", displayEthnicity, sep = "" )
+          
+        }
+        print(ggplot(df.long,aes(MainMode_reduced_val,value,fill=variable)) + ggtitle(paste("Main Mode: Baseline versus ", filtered_title, sep = "")) 
+              + geom_bar(stat="identity",position="dodge") 
               + labs(x = "", y = "Frequency (%) ") + theme(text = element_text(size = 14)))
         
       }
@@ -77,6 +113,17 @@ shinyServer(function(input, output, session){
       }
     }
     
+  })
+
+  output$myChart <- renderChart2({
+    plotDataTable()
+    if (!is.null(pd)){
+      #n <- subset(tdata, age_group %in% input$ag)
+      p1 <- nPlot(total_mmet ~ MainMode_reduced_val, group = "age_group", data = pd, type="multiBarChart")
+      #p1$show(static = FALSE)
+      p1$set(dom = 'myChart')
+      return(p1)
+    }
   })
   
   
