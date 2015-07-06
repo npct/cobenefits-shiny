@@ -16,14 +16,22 @@ uEB <- append("All", sort(unique(sdata$ebike)))
 variableList <- t(as.matrix(colnames(sdata)))
 variableList <- variableList[,6:length(colnames(sdata))]
 
-scenarios <- c("Trips" = "t",
-               "Individuals" =    "i")
+scenarios <- c("Trip Mode Share" = "t",
+               "Individual METs" =    "i")
 
 ag <- "All"
 ag <- append(ag, sort(unique(as.character(tdata$age_group))))
 
 #ses <- append("All", sort(unique(as.character(tdata$NSSec_B03ID))))
-ses <- c("All" = "All", "1" = 1, "2" = 2, "3" = 3, "4" = 4, "5" = 5)
+#ses <- c("All" = "All", "1 (richest)" = 1, "2" = 2, "3" = 3, "4" = 4, "5 (poorest)" = 5)
+
+ses <- c("All" = "All",
+          "Managerial and professional occupations" = 1,
+          "Intermediate occupations and small employers" = 2,
+          "Routine and manual occupations" = 3,
+          "Never worked and long-term unemployed" = 4,
+          "Not classified (including students)" = 5)
+
 
 #ethnicity <- append("All", sort(unique(as.character(tdata$EthGroupTS_B02ID))))
 ethnicity <- c("All" = "All", "White" = 1, "Non-white" = 2)
@@ -49,7 +57,7 @@ shinyUI(fluidPage(width="100%", height="100%",
                      radioButtons("scenario", "Scenario:", scenarios, inline = TRUE),
                      selectizeInput("ag", "Age Group:", ag, selected = ag[1], multiple = F), #options = list(maxOptions = 2)),
                      radioButtons("gender", "Gender: ", gender, inline = TRUE),
-                     selectizeInput("ses", "SES Group:", ses, selected = ses[1], multiple = F),
+                     selectizeInput("ses", "Socio Economic Classification :", ses, selected = ses[1], multiple = F),
                      selectizeInput("ethnicity", "Ethnic Group:", ethnicity, selected = ethnicity[1], multiple = F)
     )
   ),
@@ -60,7 +68,8 @@ shinyUI(fluidPage(width="100%", height="100%",
                 showOutput('plotCycPercent', "highcharts"),
                 h4("(Click on the legend to enable/disable a line)", align="center"),
                 showOutput('plotGenericVariable', "highcharts"),
-                h4("(Click on the legend to enable/disable a line)", align="center")
+                h4("(Click on the legend to enable/disable a line)", align="center"),
+                HTML('<style>iframe.rChart{ width: 100%; height: 400px;}</style>')
                ),
 
       tabPanel("Baseline", value=2,

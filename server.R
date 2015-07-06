@@ -26,7 +26,7 @@ shinyServer(function(input, output, session){
     else
       data <- idata
     if (input$ag != 'All'){
-      data <- subset(data, age_group %in% input$ag)
+      data <- subset(data, age_group == input$ag)
     }
     if (input$gender != 3)
       data <- subset(data, Sex_B01ID %in% input$gender)
@@ -39,6 +39,7 @@ shinyServer(function(input, output, session){
       data <- subset(data, EthGroupTS_B02ID %in% input$ethnicity)
     }
     data[is.na(data)] <- 0
+    
     pd <<- data
   })
   
@@ -46,55 +47,36 @@ shinyServer(function(input, output, session){
     plotDataTable()
     if (!is.null(pd)){
       if (input$scenario == 't'){
+        filtered_title <- getFilteredTitle(tdata)
         bcounts <- count(tdata, "MainMode_reduced_val")
         
-        bcounts$Baseline_Frequency <- bcounts$freq / sum(bcounts$freq) * 100
+        bcounts[["Total Population"]] <- bcounts$freq / sum(bcounts$freq) * 100
         bcounts$freq <- NULL
         
         scounts <- count(pd, "MainMode_reduced_val")
         scounts$freq1 <- scounts$freq / sum(scounts$freq) * 100
         
-        ecounts <- data.frame(v1=bcounts$Baseline_Frequency, Filtered_Frequency=scounts[match(bcounts$MainMode_reduced_val, scounts$MainMode_reduced_val), 3])
+        ecounts <- data.frame(v1=bcounts[["Total Population"]], Filtered_Frequency=scounts[match(bcounts$MainMode_reduced_val, scounts$MainMode_reduced_val), 3])
 
-        bcounts$Filtered_Frequency <- ecounts$Filtered_Frequency
+        bcounts[["Selected Population"]] <- ecounts$Filtered_Frequency
         
         df.long<-melt(bcounts)
 
-        filtered_title <- "Baseline"
-        if (nrow(tdata) != nrow (pd)){
-          
-          displayGender <- "All"
-          if (input$gender == 1){
-            displayGender <- "Male"
-          }else if (input$gender == 2){
-            displayGender <- "Female"
-          }
-          
-          displayEthnicity <- "All"
-          if (input$ethnicity == 1){
-            displayEthnicity <- "White"
-          }else if (input$ethnicity == 2){
-            displayEthnicity <- "Non-White"
-          }
-          
-          
-          filtered_title <- paste("Age Group: ", str_trim(input$ag), ", Gender: ", displayGender, " \n SES: ", input$ses, " and Ethnicity: ", displayEthnicity, sep = "" )
-          
-        }
-        print(ggplot(df.long,aes(MainMode_reduced_val,value,fill=variable)) + ggtitle(paste("Main Mode: Baseline versus ", filtered_title, sep = "")) 
+        print(ggplot(df.long,aes(MainMode_reduced_val,value,fill=variable)) + ggtitle(paste("Main Mode: Total population versus population selected for scenario \n(selected population currently defined as ", filtered_title, ")", sep = "")) 
               + geom_bar(stat="identity",position="dodge") 
               + labs(x = "", y = "Frequency (%) ") + theme(text = element_text(size = 14)))
         
       }
 
       else{
+        filtered_title <- getFilteredTitle(idata)
         max_val <- max(pd$total_mmet)
         if (max_val < 60){
-          hist(pd$total_mmet, xlab = "Total Marginal MET", main = "Total Marginal MET (Individual Based Dataset)",
+          hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""),
                breaks = c(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet)))
         }
         else{
-          hist(pd$total_mmet, xlab = "Total Marginal MET", main = "Total Marginal MET (Individual Based Dataset)",
+          hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""),
                breaks = c(seq(min(pd$total_mmet), 60, by = 5),max(pd$total_mmet)), xlim = c(min(pd$total_mmet), 60), right=FALSE)
         }
       }
@@ -103,22 +85,59 @@ shinyServer(function(input, output, session){
   })
 
   output$plotBaseline <- renderPlot({
-    #     plotDataTable()
     if (!is.null(tdata)){
-      if (input$scenario == 't'){
-#         par(mar = c(10, 4, 5, 5) + 0.2)
-#         
-#         barplot(height=table(tdata$MainMode_reduced, tdata$MainMode_reduced_val), las=2,
-#                 cex.names=1, col=1:length(unique(tdata$MainMode_reduced)),
-#                 main = "Baseline: Mode of Travel")
-      }
-      else{
-        hist(idata$total_mmet, xlab = "Total Marginal MET", main = "Baseline: Total Marginal MET",
+      if (input$scenario == 'i'){
+        hist(idata$total_mmet, xlab = "Total Marginal MET", main = "Total Marginal MET of Total Population",
              breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60), right=FALSE)
       }
     }
     
   })
+
+  getFilteredTitle <- function(data){
+    filtered_title <- "total population (baseline)"
+    if (nrow(data) != nrow (pd)){
+      
+      displayGender <- "All"
+      if (input$gender == 1){
+        displayGender <- "Male"
+      }else if (input$gender == 2){
+        displayGender <- "Female"
+      }
+      
+      displayEthnicity <- "All"
+      if (input$ethnicity == 1){
+        displayEthnicity <- "White"
+      }else if (input$ethnicity == 2){
+        displayEthnicity <- "Non-White"
+      }
+      
+      ses <- c("All" = "All",
+               "Managerial and professional occupations" = 1,
+               "Intermediate occupations and small employers" = 2,
+               "Routine and manual occupations" = 3,
+               "Never worked and long-term unemployed" = 4,
+               "Not classified (including students)" = 5)      
+      
+      displaySES <- "All"
+      if (input$ses == 1){
+        displaySES <- "Managerial and professional occupations"
+      }else if (input$ses == 2){
+        displaySES <- "Intermediate occupations and small employers"
+      }else if (input$ses == 3){
+        displaySES <- "Routine and manual occupations"
+      }else if (input$ses == 4){
+        displaySES <- "Never worked and long-term unemployed"
+      }else if (input$ses == 5){
+        displaySES <- "Not classified (including students)"
+      }
+      
+      filtered_title <- paste("Age Group: ", str_trim(input$ag), ", Gender: ", displayGender, " \n Socio Economic Classification: ", displaySES, " and Ethnicity: ", displayEthnicity, sep = "" )
+      filtered_title
+    }else
+      filtered_title
+  }
+
   
   generateScenarioTable<- reactive({
     
