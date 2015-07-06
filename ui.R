@@ -33,7 +33,7 @@ gender <- c("All" = 3,
             "Female" = 2)
 
 
-shinyUI(pageWithSidebar(
+shinyUI(fluidPage(width="100%", height="100%",
   headerPanel("Co-Benefit Model"),
   sidebarPanel(
     conditionalPanel(condition="input.conditionedPanels==1",
@@ -58,7 +58,9 @@ shinyUI(pageWithSidebar(
     tabsetPanel(
       tabPanel("Scenarios", value=1,
                 showOutput('plotCycPercent', "highcharts"),
-                showOutput('plotGenericVariable', "highcharts")
+                h4("(Click on the legend to enable/disable a line)", align="center"),
+                showOutput('plotGenericVariable', "highcharts"),
+                h4("(Click on the legend to enable/disable a line)", align="center")
                ),
 
       tabPanel("Baseline", value=2,

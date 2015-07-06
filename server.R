@@ -179,6 +179,8 @@ shinyServer(function(input, output, session){
     h1$yAxis(title = list(text = var))
     #h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F)[-1], title = list(text = 'Cycling Multiplier'))
     h1$xAxis(categories = sort(unique(sdata$MS), decreasing = F), title = list(text = 'Cycling Multiplier'))
+    #h1$legend(title = list(text = "(Click to disable/enable splines)"))
+    #h1$legend(symbolWidth = 80)
     
     if (input$inTDR == "All"){                 # & input$inEB == "All" & input$inEQ == "All"){
       if (input$inEB != "All" & input$inEQ != "All"){
