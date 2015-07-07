@@ -43,17 +43,81 @@ shinyServer(function(input, output, session){
     pd <<- data
   })
   
-  output$plotMode <- renderPlot({
+  #   output$plotMode <- renderPlot({
+  #     plotDataTable()
+  #     if (!is.null(pd)){
+  #       if (input$scenario == 't'){
+  #         filtered_title <- getFilteredTitle(tdata)
+  #         bcounts <- count(tdata, "MainMode_reduced_val")
+  #         bcounts$tp <- bcounts$freq / sum(bcounts$freq) * 100
+  #         bcounts$freq <- NULL
+  #         
+  #         scounts <- count(pd, "MainMode_reduced_val")
+  #         scounts$freq1 <- scounts$freq / sum(scounts$freq) * 100
+  #         
+  #         
+  #         
+  #         ecounts <- data.frame(v1=bcounts$tp, Filtered_Frequency=scounts[match(bcounts$MainMode_reduced_val, scounts$MainMode_reduced_val), 3])
+  #         
+  #         bcounts[["Total Population"]] <- bcounts$tp
+  #         bcounts$tp <- NULL
+  #         
+  #         bcounts[["Selected Population"]] <- ecounts$Filtered_Frequency
+  #         
+  #         
+  #         
+  #         df.long<-melt(bcounts)
+  #         
+  #         print(ggplot(df.long,aes(MainMode_reduced_val,value,fill=variable)) + ggtitle(paste("Main Mode: Total population versus population selected for scenario \n(selected population currently defined as ", filtered_title, ")", sep = "")) 
+  #               + geom_bar(stat="identity",position="dodge") 
+  #               + labs(x = "", y = "Frequency (%) ") + theme(text = element_text(size = 14)))
+  #         
+  #       }
+  #       
+  #       else{
+  #         filtered_title <- getFilteredTitle(idata)
+  #         max_val <- max(pd$total_mmet)
+  #         if (max_val < 60){
+  #           if (max_val > 5){
+  #             hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""),
+  #                  breaks = c(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet)))
+  #           }else{
+  #             hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""))
+  #           }
+  #         }
+  #         else{
+  #           hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""),
+  #                breaks = c(seq(min(pd$total_mmet), 60, by = 5),max(pd$total_mmet)), xlim = c(min(pd$total_mmet), 60), right=FALSE)
+  #         }
+  #       }
+  #     }
+  #     
+  #   })
+  
+  output$plotMode <- renderChart({
     plotDataTable()
     if (!is.null(pd)){
       if (input$scenario == 't'){
+        h1 <- Highcharts$new()
+        h1$chart(type = "column")
+        h1$plotOptions(column=list(animation=FALSE))
+        
         filtered_title <- getFilteredTitle(tdata)
+        extended_title <- paste("Main Mode: Total population versus population selected for scenario (selected population currently defined as ", filtered_title, ")", sep = "")
+        h1$title(text = extended_title)
         bcounts <- count(tdata, "MainMode_reduced_val")
+        h1$xAxis(categories = bcounts[["MainMode_reduced_val"]], title = list(text = 'Main Mode'))
+        h1$yAxis(title = list(text = 'Percentage %'))
+        
+        h1$tooltip(valueSuffix= '%')
+        
         bcounts$tp <- bcounts$freq / sum(bcounts$freq) * 100
+        bcounts$tp <- round(bcounts$tp, digits = 1)
         bcounts$freq <- NULL
         
         scounts <- count(pd, "MainMode_reduced_val")
         scounts$freq1 <- scounts$freq / sum(scounts$freq) * 100
+        scounts$freq1 <- round(scounts$freq1, digits = 1)
         
         
         
@@ -63,56 +127,73 @@ shinyServer(function(input, output, session){
         bcounts$tp <- NULL
         
         bcounts[["Selected Population"]] <- ecounts$Filtered_Frequency
-        
-        
-        
-        df.long<-melt(bcounts)
-        
-        print(ggplot(df.long,aes(MainMode_reduced_val,value,fill=variable)) + ggtitle(paste("Main Mode: Total population versus population selected for scenario \n(selected population currently defined as ", filtered_title, ")", sep = "")) 
-              + geom_bar(stat="identity",position="dodge") 
-              + labs(x = "", y = "Frequency (%) ") + theme(text = element_text(size = 14)))
-        
-      }
-      
-      else{
+        h1$series(data = bcounts[["Total Population"]], name = "Total Population")
+        h1$series(data = bcounts[["Selected Population"]], name = "Selected Population")
+        h1$set(dom = 'plotMode')
+        return (h1)
+      }else{
         filtered_title <- getFilteredTitle(idata)
         max_val <- max(pd$total_mmet)
+        h <- NULL
         if (max_val < 60){
           if (max_val > 5){
-            hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""),
-                 breaks = c(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet)))
+            bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet))))
           }else{
-            hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""))
+            bc <- table (cut (pd$total_mmet, breaks = c(0, max(pd$total_mmet) + 1)))
           }
         }
         else{
-          hist(pd$total_mmet, xlab = "Total Marginal MET", main = paste("Total Marginal MET of population selected for scenario \n(selected population currently defined as: ",filtered_title, ")", sep = ""),
-               breaks = c(seq(min(pd$total_mmet), 60, by = 5),max(pd$total_mmet)), xlim = c(min(pd$total_mmet), 60), right=FALSE)
+          bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), 60, by = 5),max(pd$total_mmet)), xlim = c(min(pd$total_mmet), 60)))
         }
+        extended_title <- paste("Total Marginal MET of population selected for scenario (selected population currently defined as: ",filtered_title, ")", sep = "")
+        bc <- as.data.frame(bc)
+        
+        h1 <- Highcharts$new()
+        h1$title(text = extended_title)
+        h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
+        h1$chart(type = "column")
+        h1$plotOptions(column=list(animation=FALSE))
+        h1$series(data = bc$Freq, name = "Selected Population")
+        h1$set(dom = 'plotMode')
+        return(h1)
       }
     }
-    
   })
   
-  #   output$plotMode <- renderChart({
-  #     
-  #     plotDataTable()
-  #     h <- Highcharts$new()
-  #     h$chart(type = "bar")
-  #     #filtered_title <- getFilteredTitle(tdata)
-  #     #bcounts <- count(tdata, "MainMode_reduced_val")
-  #     h$series(data = tdata$MainMode_reduced)
-  #     h$set(dom = 'plotMode')
-  #     return (h)
-  #     
-  #     
-  #   })
-  
-  output$plotBaseline <- renderPlot({
+  output$plotBaseline <- renderChart({
     if (!is.null(tdata)){
       if (input$scenario == 'i'){
-        hist(idata$total_mmet, xlab = "Total Marginal MET", main = "Total Marginal MET of Total Population",
-             breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60), right=FALSE)
+#         hist(idata$total_mmet, xlab = "Total Marginal MET", main = "Total Marginal MET of Total Population",
+#              breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60), right=FALSE)
+        
+        filtered_title <- getFilteredTitle(idata)
+        max_val <- max(idata$total_mmet)
+        h <- NULL
+        if (max_val < 60){
+          if (max_val > 5){
+            bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), ceiling(max(idata$total_mmet)), by = 5), max(idata$total_mmet))))
+          }else{
+            bc <- table (cut (idata$total_mmet, breaks = c(0, max(idata$total_mmet) + 1)))
+          }
+        }
+        else{
+          bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
+        }
+        extended_title <- paste("Total Marginal MET of total population")
+        bc <- as.data.frame(bc)
+        
+        h1 <- Highcharts$new()
+        h1$title(text = extended_title)
+        h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
+        h1$chart(type = "column")
+        h1$plotOptions(column=list(animation=FALSE))
+        h1$series(data = bc$Freq, name = "Total Population")
+        h1$set(dom = 'plotBaseline')
+        return(h1)
+      }else{
+        h1 <- Highcharts$new()
+        h1$set(dom = 'plotBaseline')
+        return(h1)
       }
     }
     
@@ -156,7 +237,7 @@ shinyServer(function(input, output, session){
         displaySES <- "Not classified (including students)"
       }
       
-      filtered_title <- paste("Age Group: ", str_trim(input$ag), ", Gender: ", displayGender, " \n Socio Economic Classification: ", displaySES, " and Ethnicity: ", displayEthnicity, sep = "" )
+      filtered_title <- paste("Age Group: ", str_trim(input$ag), ", Gender: ", displayGender, " Socio Economic Classification: ", displaySES, " and Ethnicity: ", displayEthnicity, sep = "" )
       filtered_title
     }else
       filtered_title
