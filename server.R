@@ -58,20 +58,22 @@ shinyServer(function(input, output, session){
         
         
         ecounts <- data.frame(v1=bcounts$tp, Filtered_Frequency=scounts[match(bcounts$MainMode_reduced_val, scounts$MainMode_reduced_val), 3])
-
-        bcounts[["Selected Population"]] <- ecounts$Filtered_Frequency
         
         bcounts[["Total Population"]] <- bcounts$tp
         bcounts$tp <- NULL
         
+        bcounts[["Selected Population"]] <- ecounts$Filtered_Frequency
+        
+        
+        
         df.long<-melt(bcounts)
-
+        
         print(ggplot(df.long,aes(MainMode_reduced_val,value,fill=variable)) + ggtitle(paste("Main Mode: Total population versus population selected for scenario \n(selected population currently defined as ", filtered_title, ")", sep = "")) 
               + geom_bar(stat="identity",position="dodge") 
               + labs(x = "", y = "Frequency (%) ") + theme(text = element_text(size = 14)))
         
       }
-
+      
       else{
         filtered_title <- getFilteredTitle(idata)
         max_val <- max(pd$total_mmet)
@@ -91,7 +93,21 @@ shinyServer(function(input, output, session){
     }
     
   })
-
+  
+  #   output$plotMode <- renderChart({
+  #     
+  #     plotDataTable()
+  #     h <- Highcharts$new()
+  #     h$chart(type = "bar")
+  #     #filtered_title <- getFilteredTitle(tdata)
+  #     #bcounts <- count(tdata, "MainMode_reduced_val")
+  #     h$series(data = tdata$MainMode_reduced)
+  #     h$set(dom = 'plotMode')
+  #     return (h)
+  #     
+  #     
+  #   })
+  
   output$plotBaseline <- renderPlot({
     if (!is.null(tdata)){
       if (input$scenario == 'i'){
@@ -101,7 +117,7 @@ shinyServer(function(input, output, session){
     }
     
   })
-
+  
   getFilteredTitle <- function(data){
     filtered_title <- "total population (baseline)"
     if (nrow(data) != nrow (pd)){
@@ -145,18 +161,18 @@ shinyServer(function(input, output, session){
     }else
       filtered_title
   }
-
+  
   
   generateScenarioTable<- reactive({
     
-#     lMS <- input$inMS
+    #     lMS <- input$inMS
     lTDR <- input$inTDR
     lEB <- input$inEB
     lEQ <- input$inEQ
     
     data <- sdata
-#     if (lMS != "All")
-#       data <- subset(data, MS == lMS)# & TDR == lTDR & equity == lEQ & ebike == lEB)
+    #     if (lMS != "All")
+    #       data <- subset(data, MS == lMS)# & TDR == lTDR & equity == lEQ & ebike == lEB)
     if (lTDR != "All")
       data <- subset(data, TDR == lTDR)
     if (lEQ != "All")
@@ -169,9 +185,9 @@ shinyServer(function(input, output, session){
     # data[order(Age),]
     scdata <<- data
   })
-
-  reactiveFunction <- reactive({
   
+  reactiveFunction <- reactive({
+    
     lTDR <- input$inTDR
     lEB <- input$inEB
     lEQ <- input$inEQ
@@ -191,14 +207,14 @@ shinyServer(function(input, output, session){
   #   LongDashDotDot
   
   genericPlot <- function(var){
-#     reactiveFunction()
-#     cat("start", nrow(scdata), "\n")
-#     if (!is.null(sdata)){}
-#     cat(input$inTDR,  " : ", input$inEB, " : ", input$inEQ, "\n")
+    #     reactiveFunction()
+    #     cat("start", nrow(scdata), "\n")
+    #     if (!is.null(sdata)){}
+    #     cat(input$inTDR,  " : ", input$inEB, " : ", input$inEQ, "\n")
     #if (input$inTDR == "All" & input$inMS == "All"){
-#     input$inTDR
-#     input$inEB
-#     input$inEQ
+    #     input$inTDR
+    #     input$inEB
+    #     input$inEQ
     
     h1 <- Highcharts$new()
     h1$chart(type = "spline")
@@ -338,7 +354,7 @@ shinyServer(function(input, output, session){
         h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB 1 and EQ 0)"))
         sub1 <- subset(scdata, TDR == input$inTDR & ebike == 1 & equity == 1)
         h1$series(data = sub1[[var]], name = paste("TDR ", input$inTDR, " (EB 1 and EQ 1)"))
-
+        
       }
       
       
@@ -379,5 +395,5 @@ shinyServer(function(input, output, session){
     h$set(dom = 'plotGenericVariable')
     return (h)
   })
-
+  
 })
