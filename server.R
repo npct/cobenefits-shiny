@@ -147,10 +147,13 @@ shinyServer(function(input, output, session){
         }
         extended_title <- paste("Total Marginal MET of population selected for scenario (selected population currently defined as: ",filtered_title, ")", sep = "")
         bc <- as.data.frame(bc)
+        bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
         
         h1 <- Highcharts$new()
         h1$title(text = extended_title)
+        h1$tooltip(valueSuffix= '%')
         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
+        h1$yAxis(title = list(text = 'Percentage %'))
         h1$chart(type = "column")
         h1$plotOptions(column=list(animation=FALSE))
         h1$series(data = bc$Freq, name = "Selected Population")
@@ -181,10 +184,12 @@ shinyServer(function(input, output, session){
         }
         extended_title <- paste("Total Marginal MET of total population")
         bc <- as.data.frame(bc)
+        bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
         
         h1 <- Highcharts$new()
         h1$title(text = extended_title)
         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
+        h1$yAxis(title = list(text = 'Percentage %'))
         h1$chart(type = "column")
         h1$plotOptions(column=list(animation=FALSE))
         h1$series(data = bc$Freq, name = "Total Population")
@@ -237,7 +242,7 @@ shinyServer(function(input, output, session){
         displaySES <- "Not classified (including students)"
       }
       
-      filtered_title <- paste("Age Group: ", str_trim(input$ag), ", Gender: ", displayGender, " Socio Economic Classification: ", displaySES, " and Ethnicity: ", displayEthnicity, sep = "" )
+      filtered_title <- paste("Age Group: ", str_trim(input$ag), ", Gender: ", displayGender, ", Socio Economic Classification: ", displaySES, " and Ethnicity: ", displayEthnicity, sep = "" )
       filtered_title
     }else
       filtered_title
