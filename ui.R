@@ -46,9 +46,9 @@ shinyUI(fluidPage(width="100%", height="100%",
   sidebarPanel(
     conditionalPanel(condition="input.conditionedPanels==1",
                      #selectInput(inputId = "inMS", label = h4("Select Cycling Multiplier:"), choices =  uMS),
-                     selectInput(inputId = "inTDR", label = h4("Select Travel Distance Reduction (TDR):"), choices =  uTDR),
-                     selectInput(inputId = "inEB", label = h4("Select Ebike:"), choices =  uEB),
-                     selectInput(inputId = "inEQ", label = h4("Select Equity:"), choices =  uEQ),
+                     selectInput(inputId = "inTDR", label = h4("Select Travel Distance Reduction (TDR):"), choices =  uTDR, selected = uTDR[length(uTDR)]),
+                     selectInput(inputId = "inEB", label = h4("Select Ebike (EB):"), choices =  uEB),
+                     selectInput(inputId = "inEQ", label = h4("Select Equity (EQ):"), choices =  uEQ),
                      selectInput('varname', label = h4('Plot Variable:'), variableList)
 
 
