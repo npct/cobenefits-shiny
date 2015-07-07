@@ -1,6 +1,6 @@
 library(stringr)
-tdata <- read.csv("data/reduced_tdata.csv")
-idata <- read.csv("data/idata.csv")
+tdata <- read.csv("data/reduced_tdata.csv", as.is = T)
+idata <- read.csv("data/idata.csv", as.is = T)
 tdata$age_group <- as.character(tdata$age_group)
 tdata$age_group <- str_trim(tdata$age_group)
 idata$age_group <- as.character(idata$age_group)
