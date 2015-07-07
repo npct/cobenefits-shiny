@@ -146,8 +146,9 @@ shinyServer(function(input, output, session){
         bc <- as.data.frame(bc)
         bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
         
-        h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
-        h1$yAxis(title = list(text = 'Percentage %'))
+#         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
+        h1$xAxis(categories = as.list(append(as.numeric( sub("\\D*(\\d+).*", "\\1", bc$Var1[-1])), "60+")), title = list(text = 'Total Marginal MET'))
+        h1$yAxis(categories = seq(from = 0, to = max(bc$Freq), by = 10), title = list(text = 'Percentage %'), replace=F)
         
         h1$series(data = bc$Freq, name = "Total Population")
         
@@ -195,6 +196,8 @@ shinyServer(function(input, output, session){
         h1$title(text = extended_title)
         h1$tooltip(valueSuffix= '%')
         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
+        
+        
         h1$yAxis(title = list(text = 'Percentage %'))
 
         h1$chart(type = "column")
