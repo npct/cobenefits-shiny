@@ -6,8 +6,8 @@ if (!require(rCharts)) {
   library(rCharts)
 }
 library(reshape2)
-library(plyr)
 library(dplyr)
+library(plyr)
 library(ggplot2)
 library(stringr)
 
@@ -49,16 +49,20 @@ shinyServer(function(input, output, session){
       if (input$scenario == 't'){
         filtered_title <- getFilteredTitle(tdata)
         bcounts <- count(tdata, "MainMode_reduced_val")
-        
-        bcounts[["Total Population"]] <- bcounts$freq / sum(bcounts$freq) * 100
+        bcounts$tp <- bcounts$freq / sum(bcounts$freq) * 100
         bcounts$freq <- NULL
         
         scounts <- count(pd, "MainMode_reduced_val")
         scounts$freq1 <- scounts$freq / sum(scounts$freq) * 100
         
-        ecounts <- data.frame(v1=bcounts[["Total Population"]], Filtered_Frequency=scounts[match(bcounts$MainMode_reduced_val, scounts$MainMode_reduced_val), 3])
+        
+        
+        ecounts <- data.frame(v1=bcounts$tp, Filtered_Frequency=scounts[match(bcounts$MainMode_reduced_val, scounts$MainMode_reduced_val), 3])
 
         bcounts[["Selected Population"]] <- ecounts$Filtered_Frequency
+        
+        bcounts[["Total Population"]] <- bcounts$tp
+        bcounts$tp <- NULL
         
         df.long<-melt(bcounts)
 
