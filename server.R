@@ -133,6 +133,25 @@ shinyServer(function(input, output, session){
         return (h1)
       }else{
         filtered_title <- getFilteredTitle(idata)
+        
+        
+        #h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
+        #h1$yAxis(title = list(text = 'Percentage %'))
+        h1 <- Highcharts$new()
+        h1$chart(type = "column")
+        h1$plotOptions(column=list(animation=FALSE))
+
+        
+        bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
+        bc <- as.data.frame(bc)
+        bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
+        
+        h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
+        h1$yAxis(title = list(text = 'Percentage %'))
+        
+        h1$series(data = bc$Freq, name = "Total Population")
+        
+        
         max_val <- max(pd$total_mmet)
         h <- NULL
         if (max_val < 60){
@@ -148,15 +167,10 @@ shinyServer(function(input, output, session){
         extended_title <- paste("Total Marginal MET of population selected for scenario (selected population currently defined as: ",filtered_title, ")", sep = "")
         bc <- as.data.frame(bc)
         bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
+        h1$series(data = bc$Freq, name = "Selected Population")
         
-        h1 <- Highcharts$new()
         h1$title(text = extended_title)
         h1$tooltip(valueSuffix= '%')
-        h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
-        h1$yAxis(title = list(text = 'Percentage %'))
-        h1$chart(type = "column")
-        h1$plotOptions(column=list(animation=FALSE))
-        h1$series(data = bc$Freq, name = "Selected Population")
         h1$set(dom = 'plotMode')
         return(h1)
       }
@@ -172,24 +186,17 @@ shinyServer(function(input, output, session){
         filtered_title <- getFilteredTitle(idata)
         max_val <- max(idata$total_mmet)
         h <- NULL
-        if (max_val < 60){
-          if (max_val > 5){
-            bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), ceiling(max(idata$total_mmet)), by = 5), max(idata$total_mmet))))
-          }else{
-            bc <- table (cut (idata$total_mmet, breaks = c(0, max(idata$total_mmet) + 1)))
-          }
-        }
-        else{
-          bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
-        }
+        bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
         extended_title <- paste("Total Marginal MET of total population")
         bc <- as.data.frame(bc)
         bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
         
         h1 <- Highcharts$new()
         h1$title(text = extended_title)
+        h1$tooltip(valueSuffix= '%')
         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
         h1$yAxis(title = list(text = 'Percentage %'))
+
         h1$chart(type = "column")
         h1$plotOptions(column=list(animation=FALSE))
         h1$series(data = bc$Freq, name = "Total Population")

@@ -78,8 +78,8 @@ shinyUI(fluidPage(width="100%", height="100%",
 #                    showOutput("plotMode","Nvd3")
 #                ),
                 #plotOutput("plotMode"),
-                showOutput('plotMode', "highcharts"),
-                showOutput('plotBaseline', 'highcharts'))
+                showOutput('plotMode', "highcharts"))
+#                 showOutput('plotBaseline', 'highcharts'))
       , id = "conditionedPanels"
     )
   )
