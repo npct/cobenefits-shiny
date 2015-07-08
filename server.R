@@ -169,20 +169,24 @@ shinyServer(function(input, output, session){
         
         
         h1$series(data = bc$Freq, name = "Total Population")
-        
+        #cat(nrow(pd), "\n")
         max_val <- 0
         if (nrow(pd) > 1)
           max_val <- max(pd$total_mmet, na.rm = T)
         h <- NULL
         if (max_val < 60){
           if (max_val > 5){
+            #cat(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet), "\n")
             bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet))))
+            
           }else{
+            #cat(c(0, max(pd$total_mmet) + 1), "\n")
             bc <- table (cut (pd$total_mmet, breaks = c(0, max(pd$total_mmet) + 1)))
           }
         }
         else{
-          bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), 60, by = 5),max(pd$total_mmet)), xlim = c(min(pd$total_mmet), 60)))
+          #cat(c(seq(min(pd$total_mmet), 55, by = 5),max(pd$total_mmet)), "\n")
+          bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), 55, by = 5),max(pd$total_mmet)), xlim = c(min(pd$total_mmet), 60)))
         }
         extended_title <- paste("Total Marginal MET of population selected for scenario (selected population currently defined as: ",filtered_title, ")", sep = "")
         bc <- as.data.frame(bc)
