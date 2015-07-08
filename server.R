@@ -156,11 +156,12 @@ shinyServer(function(input, output, session){
         h1$chart(type = "column")
         h1$plotOptions(column=list(animation=FALSE))
                 
-        
+        #, >0 >= 4.4, >4.4 >=8.75, >8.75>= 13.2
+        #bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
         bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
         bc <- as.data.frame(bc)
         bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
-        cat("total: ", nrow(as.data.frame(bc)), "\n")
+        #cat("total: ", nrow(as.data.frame(bc)), "\n")
         bc1max <- max(bc$Freq, na.rm = T)
         
                 #         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
@@ -191,7 +192,7 @@ shinyServer(function(input, output, session){
           filter <- TRUE
         bc2max <- 0
         #cat(bc[1:1], " : ", bc[1:2], "\n")
-        cat("filtered: ", nrow(as.data.frame(bc)), "\n")
+        #cat("filtered: ", nrow(as.data.frame(bc)), "\n")
         #print(bc, quote = TRUE, row.names = FALSE)
         if (nrow(as.data.frame(bc)) > 1)
           bc2max <- max(bc$Freq, na.rm = T)
