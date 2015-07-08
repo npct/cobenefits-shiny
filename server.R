@@ -186,7 +186,8 @@ shinyServer(function(input, output, session){
         }
         else{
           #cat(c(seq(min(pd$total_mmet), 55, by = 5),max(pd$total_mmet)), "\n")
-          bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), 55, by = 5),max(pd$total_mmet)), xlim = c(min(pd$total_mmet), 60)))
+          #bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), 55, by = 5),max(pd$total_mmet)), xlim = c(min(pd$total_mmet), 60)))
+          bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), 60, by = 5),max(pd$total_mmet))))
         }
         extended_title <- paste("Total Marginal MET of population selected for scenario (selected population currently defined as: ",filtered_title, ")", sep = "")
         bc <- as.data.frame(bc)
