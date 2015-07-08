@@ -132,6 +132,7 @@ shinyServer(function(input, output, session){
         h1$yAxis(min = 0, max = max(80, max(bcounts[["Total Population"]], na.rm=TRUE), max(bcounts[["Selected Population"]], na.rm=TRUE)), tickInterval = 20, title = list(text = 'Percentage %'))
         #cat(max(bcounts[["Total Population"]], na.rm=TRUE), " : ",  max(bcounts[["Selected Population"]], na.rm=TRUE), "\n")
         h1$set(dom = 'plotMode')
+        h1$exporting(enabled = T)
         return (h1)
       }else{
         filtered_title <- getFilteredTitle(idata)
@@ -180,6 +181,7 @@ shinyServer(function(input, output, session){
         h1$title(text = extended_title)
         h1$tooltip(valueSuffix= '%')
         h1$set(dom = 'plotMode')
+        h1$exporting(enabled = T)
         return(h1)
       }
     }
@@ -211,10 +213,12 @@ shinyServer(function(input, output, session){
         h1$plotOptions(column=list(animation=FALSE))
         h1$series(data = bc$Freq, name = "Total Population")
         h1$set(dom = 'plotBaseline')
+        h1$exporting(enabled = T)
         return(h1)
       }else{
         h1 <- Highcharts$new()
         h1$set(dom = 'plotBaseline')
+        h1$exporting(enabled = T)
         return(h1)
       }
     }
