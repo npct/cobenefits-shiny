@@ -107,8 +107,8 @@ shinyServer(function(input, output, session){
         h1$title(text = extended_title)
         bcounts <- count(tdata, "MainMode_reduced_val")
         h1$xAxis(categories = bcounts[["MainMode_reduced_val"]], title = list(text = 'Main Mode'))
-        h1$yAxis(title = list(text = 'Percentage %'))
         
+        #categories = seq(from = 0, to = 100 , by =20)
         h1$tooltip(valueSuffix= '%')
         
         bcounts$tp <- bcounts$freq / sum(bcounts$freq) * 100
@@ -129,6 +129,8 @@ shinyServer(function(input, output, session){
         bcounts[["Selected Population"]] <- ecounts$Filtered_Frequency
         h1$series(data = bcounts[["Total Population"]], name = "Total Population")
         h1$series(data = bcounts[["Selected Population"]], name = "Selected Population")
+        h1$yAxis(min = 0, max = max(80, max(bcounts[["Total Population"]], na.rm=TRUE), max(bcounts[["Selected Population"]], na.rm=TRUE)), tickInterval = 20, title = list(text = 'Percentage %'))
+        #cat(max(bcounts[["Total Population"]], na.rm=TRUE), " : ",  max(bcounts[["Selected Population"]], na.rm=TRUE), "\n")
         h1$set(dom = 'plotMode')
         return (h1)
       }else{
@@ -145,10 +147,11 @@ shinyServer(function(input, output, session){
         bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
         bc <- as.data.frame(bc)
         bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
+        bc1max <- max(bc$Freq, na.rm = T)
         
 #         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
         h1$xAxis(categories = as.list(append(as.numeric( sub("\\D*(\\d+).*", "\\1", bc$Var1[-1])), "60+")), title = list(text = 'Total Marginal MET'))
-        h1$yAxis(categories = seq(from = 0, to = max(bc$Freq), by = 10), title = list(text = 'Percentage %'), replace=F)
+        
         
         h1$series(data = bc$Freq, name = "Total Population")
         
@@ -168,6 +171,10 @@ shinyServer(function(input, output, session){
         extended_title <- paste("Total Marginal MET of population selected for scenario (selected population currently defined as: ",filtered_title, ")", sep = "")
         bc <- as.data.frame(bc)
         bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
+        bc2max <- max(bc$Freq, na.rm = T)
+        max_y <- max(bc1max, bc2max)
+        h1$yAxis(min = 0, max = max(30, max_y), tickInterval = 10, title = list(text = 'Percentage %'))
+
         h1$series(data = bc$Freq, name = "Selected Population")
         
         h1$title(text = extended_title)
@@ -198,7 +205,7 @@ shinyServer(function(input, output, session){
         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
         
         
-        h1$yAxis(title = list(text = 'Percentage %'))
+        #h1$yAxis(title = list(text = 'Percentage %'))
 
         h1$chart(type = "column")
         h1$plotOptions(column=list(animation=FALSE))
