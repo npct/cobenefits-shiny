@@ -137,7 +137,7 @@ shinyServer(function(input, output, session){
           h1$yAxis(min = 0, max = max(80, max(bcounts[["Total Population"]], na.rm=TRUE), max(bcounts[["Selected Population"]], na.rm=TRUE)), tickInterval = 20, title = list(text = 'Percentage %'))
           
         }else{
-          h1$subtitle(text =  'Sorry: Not Enough Data to Display Selected Population')
+          h1$subtitle(text =  'Sorry: Not Enough Data to Display Selected Population (Population Size < 10)')
           h1$yAxis(min = 0, max = max(80, max(bcounts[["Total Population"]], na.rm=TRUE)), tickInterval = 20, title = list(text = 'Percentage %'))
         }
         
@@ -201,7 +201,7 @@ shinyServer(function(input, output, session){
         if(filter){
           h1$series(data = bc$Freq, name = "Selected Population")
         }else{
-          h1$subtitle(text =  'Sorry: Not Enough Data to Display Selected Population')
+          h1$subtitle(text =  'Sorry: Not Enough Data to Display Selected Population (Population Size < 10)')
         }
         
         h1$title(text = extended_title)
