@@ -197,7 +197,7 @@ shinyServer(function(input, output, session){
         #cat(bc[1:1], " : ", bc[1:2], "\n")
         #cat("filtered: ", nrow(as.data.frame(bc)), "\n")
         #print(bc, quote = TRUE, row.names = FALSE)
-        if (nrow(as.data.frame(bc)) > 1)
+        if (nrow(as.data.frame(bc)) > 0)
           bc2max <- max(bc$Freq, na.rm = T)
         max_y <- max(bc1max, bc2max)
         h1$yAxis(min = 0, max = max(30, max_y), tickInterval = 10, title = list(text = 'Percentage %'))
