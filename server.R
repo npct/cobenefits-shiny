@@ -137,12 +137,10 @@ shinyServer(function(input, output, session){
           h1$yAxis(min = 0, max = max(80, max(bcounts[["Total Population"]], na.rm=TRUE), max(bcounts[["Selected Population"]], na.rm=TRUE)), tickInterval = 20, title = list(text = 'Percentage %'))
           
         }else{
-          h1$subtitle(text =  'Sorry: Not Enough Data to Display Selected Population (Population Size < 10)')
+          h1$subtitle(text = HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
           h1$yAxis(min = 0, max = max(80, max(bcounts[["Total Population"]], na.rm=TRUE)), tickInterval = 20, title = list(text = 'Percentage %'))
         }
         
-        
-        #cat(max(bcounts[["Total Population"]], na.rm=TRUE), " : ",  max(bcounts[["Selected Population"]], na.rm=TRUE), "\n")
         h1$set(dom = 'plotMode')
         h1$exporting(enabled = T)
         return (h1)
@@ -207,7 +205,7 @@ shinyServer(function(input, output, session){
         if(filter){
           h1$series(data = bc$Freq, name = "Selected Population")
         }else{
-          h1$subtitle(text =  'Sorry: Not Enough Data to Display Selected Population (Population Size < 10)')
+          h1$subtitle(text = HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
         }
         
         h1$title(text = extended_title)
