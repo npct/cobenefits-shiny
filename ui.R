@@ -12,6 +12,12 @@ uTDR <- append("All", sort(unique(sdata$TDR), decreasing = F))
 uEQ <- append("All",sort(unique(sdata$equity)))
 #uEQ <- sort(unique(sdata$equity))
 uEB <- append("All", sort(unique(sdata$ebike)))
+
+uBDMS <- (sort(unique(msharedtata$MS)[-1]) - 1)
+uBDTDR <- sort(unique(msharedtata$TDR), decreasing = F)
+uBDEQ <- sort(unique(msharedtata$equity))
+uBDEB <- sort(unique(msharedtata$ebike))
+
 #uEB <- sort(unique(sdata$ebike))
 variableList <- t(as.matrix(colnames(sdata)))
 variableList <- variableList[,6:length(colnames(sdata))]
@@ -54,6 +60,13 @@ shinyUI(fluidPage(width="100%", height="100%",
 
     ),
     conditionalPanel(condition="input.conditionedPanels==2",
+                     selectInput(inputId = "inBDMS", label = h4("Select Cycling Multiplier:"), choices =  uBDMS),
+                     selectInput(inputId = "inBDTDR", label = h4("Select Travel Distance Reduction (TDR):"), choices =  uBDTDR, selected = uTDR[length(uTDR)]),
+                     selectInput(inputId = "inBDEB", label = h4("Select Ebike (EB):"), choices =  uBDEB),
+                     selectInput(inputId = "inBDEQ", label = h4("Select Equity (EQ):"), choices =  uBDEQ)
+    ),
+                     
+    conditionalPanel(condition="input.conditionedPanels==3",
                      radioButtons("scenario", "Scenario:", scenarios, inline = TRUE),
                      selectizeInput("ag", "Age Group:", ag, selected = ag[1], multiple = F), #options = list(maxOptions = 2)),
                      radioButtons("gender", "Gender: ", gender, inline = TRUE),
@@ -71,13 +84,15 @@ shinyUI(fluidPage(width="100%", height="100%",
                 h4("(Click on the legend to enable/disable a line)", align="center"),
                 HTML('<style>iframe.rChart{ width: 100%; height: 400px;}</style>')
                ),
-
-      tabPanel("Baseline", value=2,
+      tabPanel("Scenarios - Mode Share", value=2,
+               showOutput('plotBDMode', "highcharts")
+               ),
+    
+      tabPanel("Baseline", value=3,
 #                div(class='wrapper',
 #                    tags$style(".Nvd3{ height: 400px;}"),
 #                    showOutput("plotMode","Nvd3")
 #                ),
-                #plotOutput("plotMode"),
                 showOutput('plotMode', "highcharts"))
 #                 showOutput('plotBaseline', 'highcharts'))
       , id = "conditionedPanels"

@@ -12,6 +12,7 @@ library(ggplot2)
 library(stringr)
 
 pd <- idata$total_mmet
+bd <- NULL
 pdl <- NULL
 
 shinyServer(function(input, output, session){
@@ -106,7 +107,7 @@ shinyServer(function(input, output, session){
         extended_title <- paste("Main Mode: Total population versus population selected for scenario (selected population currently defined as ", filtered_title, ")", sep = "")
         h1$title(text = extended_title)
         bcounts <- count(tdata, "MainMode_reduced_val")
-        h1$xAxis(categories = bcounts[["MainMode_reduced_val"]], title = list(text = 'Main Mode'))
+        h1$xAxis(categories = bcounts[["MainMode_reduced_val"]], title = list(text = 'Main Mode'))#, style = list(font = 'bold 14px')))
         
         #categories = seq(from = 0, to = 100 , by =20)
         h1$tooltip(valueSuffix= '%')
@@ -153,7 +154,7 @@ shinyServer(function(input, output, session){
         h1 <- Highcharts$new()
         h1$chart(type = "column")
         h1$plotOptions(column=list(animation=FALSE))
-                
+        
         #, >0 >= 4.4, >4.4 >=8.75, >8.75>= 13.2
         #bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
         bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
@@ -162,7 +163,7 @@ shinyServer(function(input, output, session){
         #cat("total: ", nrow(as.data.frame(bc)), "\n")
         bc1max <- max(bc$Freq, na.rm = T)
         
-                #         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
+        #         h1$xAxis(categories = bc$Var1, title = list(text = 'Total Marginal MET'))
         h1$xAxis(categories = as.list(append(as.numeric( sub("\\D*(\\d+).*", "\\1", bc$Var1[-1])), "60+")), title = list(text = 'Total Marginal MET'))
         
         
@@ -220,8 +221,8 @@ shinyServer(function(input, output, session){
   output$plotBaseline <- renderChart({
     if (!is.null(tdata)){
       if (input$scenario == 'i'){
-                #         hist(idata$total_mmet, xlab = "Total Marginal MET", main = "Total Marginal MET of Total Population",
-                #              breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60), right=FALSE)
+        #         hist(idata$total_mmet, xlab = "Total Marginal MET", main = "Total Marginal MET of Total Population",
+        #              breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60), right=FALSE)
         
         filtered_title <- getFilteredTitle(idata)
         max_val <- max(idata$total_mmet)
@@ -238,7 +239,7 @@ shinyServer(function(input, output, session){
         
         
         #h1$yAxis(title = list(text = 'Percentage %'))
-                
+        
         h1$chart(type = "column")
         h1$plotOptions(column=list(animation=FALSE))
         h1$series(data = bc$Freq, name = "Total Population")
@@ -254,6 +255,12 @@ shinyServer(function(input, output, session){
     }
     
   })
+  
+  getFilteredBDTitle <- function (){
+    filtered_title <- paste("Cycling Multiplier: ", input$inBDMS, ", TDR: ", input$inBDTDR, ", Ebike: ", input$inBDEB, " and Equity: ", input$inBDEQ, sep = "" )
+    filtered_title
+    
+  }
   
   getFilteredTitle <- function(data){
     filtered_title <- "total population (baseline)"
@@ -273,13 +280,6 @@ shinyServer(function(input, output, session){
         displayEthnicity <- "Non-White"
       }
       
-      ses <- c("All" = "All",
-               "Managerial and professional occupations" = 1,
-               "Intermediate occupations and small employers" = 2,
-               "Routine and manual occupations" = 3,
-               "Never worked and long-term unemployed" = 4,
-               "Not classified (including students)" = 5)      
-      
       displaySES <- "All"
       if (input$ses == 1){
         displaySES <- "Managerial and professional occupations"
@@ -298,6 +298,24 @@ shinyServer(function(input, output, session){
     }else
       filtered_title
   }
+  
+  
+  generateBDScenarioTable<- reactive({
+    
+    lMS <- input$inBDMS
+    lTDR <- input$inBDTDR
+    lEB <- input$inBDEB
+    lEQ <- input$inBDEQ
+    
+    data <- msharedtata
+    data <- subset(data, MS == (as.numeric(lMS) + 1) & TDR == lTDR & equity == lEQ & ebike == lEB)
+    
+    #cat(" test: ", dim(data), "\n")
+    
+    data[is.na(data)] <- 0
+    data <- arrange(data, MS)
+    bd <<- data
+  })
   
   
   generateScenarioTable<- reactive({
@@ -531,6 +549,38 @@ shinyServer(function(input, output, session){
     h <- genericPlot(input$varname)
     h$set(dom = 'plotGenericVariable')
     return (h)
+  })
+  
+  
+  output$plotBDMode <- renderChart({
+    generateBDScenarioTable()
+    if (!is.null(bd)){
+      h1 <- Highcharts$new()
+      h1$chart(type = "column")
+      h1$plotOptions(column=list(animation=FALSE))
+      
+      filtered_title <- getFilteredBDTitle()
+      extended_title <- paste("Mode Share: Total population versus selected scenario (scenario defined as ", filtered_title, ")", sep = "")
+      h1$title(text = extended_title)
+      baseline <- subset(msharedtata, MS == 1)
+      h1$series(data = baseline$case, name = "Baseline")
+      h1$series(data = bd$case, name = "Scenario")
+      
+      h1$xAxis(categories = c("Walk", "Car Driver", "Car Passenger", "Bus", "Train", "Other", "Bicycle", "Ebike"))
+      
+      h1$tooltip(valueSuffix= '%')
+      
+      #         walk
+      #         bike
+      #         car driver
+      #         car passenger
+      #         bus
+      #         train
+      #         other
+      h1$set(dom = 'plotBDMode')
+      h1$exporting(enabled = T)
+      return (h1)
+    }
   })
   
 })

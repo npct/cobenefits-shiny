@@ -8,6 +8,7 @@ tdata$age_group <- str_trim(tdata$age_group)
 idata$age_group <- as.character(idata$age_group)
 idata$age_group <- str_trim(idata$age_group)
 sdata <- read.csv("data/aggregate_summary.csv")
+msharedtata <- read.csv("data/BD_share1split.csv", as.is = T)
 # Temporarily remove baseline summary
 sdata <- sdata[-1,]
 sdata[is.na(sdata)] <- 0
