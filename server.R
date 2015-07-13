@@ -101,32 +101,39 @@ shinyServer(function(input, output, session){
         
         #, >0 >= 4.4, >4.4 >=8.75, >8.75>= 13.2
         #bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
-        bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
-        bc <- as.data.frame(bc)
+        #bc <- table (cut (idata$total_mmet, breaks = c(seq(min(idata$total_mmet), 60, by = 5),max(idata$total_mmet)), xlim = c(min(idata$total_mmet), 60)))
+        
+        bc <- as.data.frame(table (cut (idata$total_mmet, breaks = c(seq(-4.4,52.8, 4.4), max(idata$total_mmet)))))
         bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
         #cat("total: ", nrow(as.data.frame(bc)), "\n")
         bc1max <- max(bc$Freq, na.rm = T)
         
-        h1$xAxis(categories = as.list(append(as.numeric( sub("\\D*(\\d+).*", "\\1", bc$Var1[-1])), "60+")), title = list(text = 'Total Marginal MET'))
+#         h1$xAxis(categories = as.list(append(as.numeric( sub("\\D*(\\d+).*", "\\1", bc$Var1[-1])), "60+")), title = list(text = 'Total Marginal MET'))
+#         h1$xAxis(categories = as.list(append(str_extract(bc$Var1, "\\d+\\.*\\d*"), "52+")), title = list(text = 'Total Marginal MET'))
+        h1$xAxis(categories = as.list(append(c(seq(-4.4,52.8, 4.4))[-1], "52.7+")), title = list(text = 'Total Marginal MET'))
+
+        
         h1$series(data = bc$Freq, name = "Total Population")
         #cat(nrow(pd), "\n")
         max_val <- 0
         if (nrow(pd) > 1)
           max_val <- max(pd$total_mmet, na.rm = T)
         h <- NULL
-        if (max_val < 60){
+        if (max_val <= 52.8){
           if (max_val > 5){
             #cat(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet), "\n")
-            bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), ceiling(max(pd$total_mmet)), by = 5), max(pd$total_mmet))))
+            bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet) - 4.4, ceiling(max(pd$total_mmet) - 4.4), by = 4.4), max(pd$total_mmet))))
             
           }else{
             #cat(c(0, max(pd$total_mmet) + 1), "\n")
-            bc <- table (cut (pd$total_mmet, breaks = c(0, max(pd$total_mmet) + 1)))
+            
+            bc <- table (cut (pd$total_mmet, breaks = c(-4.4, max(pd$total_mmet) - 4.4 )))
           }
         }
         else{
           #cat(c(seq(min(pd$total_mmet), 55, by = 5),max(pd$total_mmet)), "\n")
-          bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet), 60, by = 5),max(pd$total_mmet))))
+          bc <- table (cut (pd$total_mmet, breaks = c(seq(-4.4,52.8, 4.4), max(pd$total_mmet))))
+          #bc <- table (cut (pd$total_mmet, breaks = c(seq(min(pd$total_mmet) - 4.4, 52.8, by = 4.4),max(pd$total_mmet) - 4.4)))
         }
         extended_title <- paste("Total Marginal MET of population selected for scenario (selected population currently defined as: ",filtered_title, ")", sep = "")
         bc <- as.data.frame(bc)
@@ -145,10 +152,12 @@ shinyServer(function(input, output, session){
         
         if(filter){
           h1$series(data = bc$Freq, name = "Selected Population")
+          mmet_per <- round(nrow(subset(pd, total_mmet >= 8.75 & total_mmet <= 17.5)) / nrow(pd) * 100, digits = 1)
+          h1$subtitle(text = paste("Selected population with marginal MET between 8.75 and 17.5: ", mmet_per, "%", sep=""), style = list(font = 'bold 12px "Trebuchet MS", Verdana, sans-serif'))
         }else{
           h1$subtitle(text = HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
         }
-        
+      
         h1$title(text = extended_title)
         h1$tooltip(valueSuffix= '%')
         h1$set(dom = 'plotMode')
