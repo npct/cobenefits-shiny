@@ -153,7 +153,7 @@ shinyServer(function(input, output, session){
         if(filter){
           h1$series(data = bc$Freq, name = "Selected Population")
           mmet_per_8.75 <- round(nrow(subset(pd, total_mmet >= 8.75 )) / nrow(pd) * 100, digits = 1)
-          mmet_per_17.5 <- round(nrow(subset(pd, total_mmet <= 17.5)) / nrow(pd) * 100, digits = 1)
+          mmet_per_17.5 <- round(nrow(subset(pd, total_mmet >= 17.5)) / nrow(pd) * 100, digits = 1)
           h1$subtitle(text = paste("Selected population with marginal MET >= 8.75: ", mmet_per_8.75, "%", " and >= 17.5: ", mmet_per_17.5, "%", sep=""), style = list(font = 'bold 12px "Trebuchet MS", Verdana, sans-serif'))
         }else{
           h1$subtitle(text = HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
