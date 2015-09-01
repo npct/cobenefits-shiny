@@ -436,26 +436,26 @@ shinyServer(function(input, output, session){
   
   output$plotCycPercent <- renderChart({
     generateScenarioTable()
-    h <- genericPlot("cyclists.perc")
+    h <- genericPlot("% Cycl. Total Population")
     h$set(dom = 'plotCycPercent')
     return (h)
   })
   
-  output$plotCO2R <- renderChart({
-    generateScenarioTable()
-    h <- genericPlot("CO2R.perc")
-    h$set(dom = 'plotCO2R')
-    return (h)
-    
-  })
-  
-  output$plotCarAccess <- renderChart({
-    generateScenarioTable()
-    h <- genericPlot("nocar.caraccess")
-    h$set(dom = 'plotCarAccess')
-    return (h)
-  })
-  
+#   output$plotCO2R <- renderChart({
+#     generateScenarioTable()
+#     h <- genericPlot("CO2R.perc")
+#     h$set(dom = 'plotCO2R')
+#     return (h)
+#     
+#   })
+#   
+#   output$plotCarAccess <- renderChart({
+#     generateScenarioTable()
+#     h <- genericPlot("nocar.caraccess")
+#     h$set(dom = 'plotCarAccess')
+#     return (h)
+#   })
+#   
   output$plotGenericVariable <- renderChart({
     generateScenarioTable()
     #retrieveVariableName()
