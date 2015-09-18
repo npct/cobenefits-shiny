@@ -18,8 +18,8 @@ uBDEB <- sort(unique(msharedtata$ebike))
 variableList <- t(as.matrix(colnames(sdata)))
 variableList <- variableList[,6:length(colnames(sdata))]
 
-scenarios <- c("Trip Mode Share" = "t",
-               "Individual METs" =    "i")
+scenarios <- c("Trip Mode Share" = "t"
+            ,"Individual METs" =    "i")
 
 ag <- "All"
 ag <- append(ag, sort(unique(as.character(tdata$age_group))))
@@ -56,14 +56,22 @@ shinyUI(fluidPage(width="100%", height="100%",
                     ),
                     
                     conditionalPanel(condition="input.conditionedPanels==3",
-                                     radioButtons("scenario", "Scenario:", scenarios, inline = TRUE),
-                                     selectizeInput("ag", "Age Group:", ag, selected = ag[1], multiple = F), #options = list(maxOptions = 2)),
-                                     radioButtons("gender", "Gender: ", gender, inline = TRUE),
-                                     selectizeInput("ses", "Socio Economic Classification :", ses, selected = ses[1], multiple = F),
-                                     selectizeInput("ethnicity", "Ethnic Group:", ethnicity, selected = ethnicity[1], multiple = F)
+#                                      radioButtons("scenario", "Scenario:", scenarios, inline = TRUE),
+                                     selectizeInput("bag", "Age Group:", ag, selected = ag[1], multiple = F),
+                                     radioButtons("bgender", "Gender: ", gender, inline = TRUE),
+                                     selectizeInput("bses", "Socio Economic Classification :", ses, selected = ses[1], multiple = F),
+                                     selectizeInput("bethnicity", "Ethnic Group:", ethnicity, selected = ethnicity[1], multiple = F)
+                    ),
+                    
+                    conditionalPanel(condition="input.conditionedPanels==4",
+#                                      radioButtons("scenario", "Scenario:", scenarios, selected = scenarios[2], inline = TRUE),
+                                     selectizeInput("mag", "Age Group:", ag, selected = ag[1], multiple = F),
+                                     radioButtons("mgender", "Gender: ", gender, inline = TRUE),
+                                     selectizeInput("mses", "Socio Economic Classification :", ses, selected = ses[1], multiple = F),
+                                     selectizeInput("methnicity", "Ethnic Group:", ethnicity, selected = ethnicity[1], multiple = F)
                     )
                   ),
-                  
+
                   mainPanel(
                     tabsetPanel(
                       tabPanel("Scenarios", value=1,
@@ -77,9 +85,14 @@ shinyUI(fluidPage(width="100%", height="100%",
                                showOutput('plotBDMode', "highcharts")
                       ),
                       
-                      tabPanel("Baseline", value=3,
-                               showOutput('plotMode', "highcharts"))
-                      , id = "conditionedPanels"
+                      tabPanel("Mode of Travel", value=3,
+                               showOutput('plotMode', "highcharts")
+                      ), 
+                      tabPanel("METs", value=4,
+                               showOutput('plotMET', "highcharts")
+                      ),
+                      
+                      id = "conditionedPanels"
                     )
                   )
 ))
