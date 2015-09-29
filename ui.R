@@ -22,7 +22,7 @@ scenarios <- c("Trip Mode Share" = "t"
                ,"Individual METs" =    "i")
 
 METSwitchRButton <- c("Baseline and Scenario" = "sep"
-               ,"Baseline versus Scenario" =    "comp")
+                      ,"Baseline versus Scenario" =    "comp")
 
 ag <- "All"
 ag <- append(ag, sort(unique(as.character(tdata$age_group))))
@@ -39,7 +39,6 @@ ethnicity <- c("All" = "All", "White" = 1, "Non-white" = 2)
 gender <- c("All" = 3,
             "Male" = 1,
             "Female" = 2)
-
 
 shinyUI(fluidPage(width="100%", height="100%",
                   headerPanel("Co-Benefit Model"),
@@ -78,11 +77,6 @@ shinyUI(fluidPage(width="100%", height="100%",
                                      selectizeInput("methnicity", "Ethnic Group:", ethnicity, selected = ethnicity[1], multiple = F),
                                      HTML("<hr>"),
                                      radioButtons("flipMETHG", label = "Flip Histogram:", METSwitchRButton, inline = TRUE)
-                                     
-#                                      selectInput(inputId = "inMETMS", label = h4("Select Cycling Multiplier:"), choices =  uBDMS),
-#                                      selectInput(inputId = "inMETTDR", label = h4("Select Travel Distance Reduction (TDR):"), choices =  uBDTDR, selected = uTDR[length(uTDR)]),
-#                                      selectInput(inputId = "inMETEB", label = h4("Select Ebike (EB):"), choices =  uBDEB),
-#                                      selectInput(inputId = "inMETEQ", label = h4("Select Equity (EQ):"), choices =  uBDEQ)
                     )
                   ),
                   

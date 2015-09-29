@@ -62,7 +62,7 @@ shinyServer(function(input, output, session){
     data[is.na(data)] <- 0
     
     pd <<- data
-
+    
     data <- scenariosIdata
     # MS1_TDR0.7_ebik0_eq0
     columnName <- paste(paste("MS", input$inMETMS,sep = ""),  paste("TDR", input$inMETTDR,sep = ""),
@@ -84,42 +84,12 @@ shinyServer(function(input, output, session){
     if (input$methnicity != "All"){
       data <- subset(data, EthGroupTS_B02ID %in% input$methnicity)
     }
-
+    
     data[is.na(data)] <- 0
     
     scFilteredMETdata <<- data
     
   })
-  
-#   plotScenarioMETDataTable<- reactive({
-#     data <- scenariosIdata
-#     # MS1_TDR0.7_ebik0_eq0
-#     columnName <- paste(paste("MS", input$inMETMS,sep = ""),  paste("TDR", input$inMETTDR,sep = ""),
-#                         paste("ebik", input$inMETEB,sep = ""), paste("eq", input$inMETEQ,sep = ""), sep="_")
-#     data["total_mmet"] <- data[columnName]
-#     
-#     scMETdata <<- data
-#     
-#     if (input$mag != 'All'){
-#       data <- subset(data, age == input$mag)
-#     }
-#     if (input$mgender != 3)
-#       data <- subset(data, Sex_B01ID %in% input$mgender)
-#     
-#     if (input$mses != "All"){
-#       data <- subset(data, NSSec_B03ID %in% input$mses)
-#     }
-#     
-#     if (input$methnicity != "All"){
-#       data <- subset(data, EthGroupTS_B02ID %in% input$methnicity)
-#     }
-#     #NSSec_B03ID  EthGroupTS_B02ID	age
-#     
-#     data[is.na(data)] <- 0
-#     
-#     scFilteredMETdata <<- data
-#     
-#   })
   
   output$plotMode <- renderChart({
     plotBLDataTable()
@@ -287,7 +257,7 @@ shinyServer(function(input, output, session){
       }
       
       filtered_scenario_title <- paste(paste("Mode Shift: ", input$inMETMS,sep = ""),  paste("Distance Reduction: ", input$inMETTDR,sep = ""),
-                          paste("Ebike :", input$inMETEB,sep = ""), paste("Equity: ", input$inMETEQ,sep = ""), sep=", ")
+                                       paste("Ebike :", input$inMETEB,sep = ""), paste("Equity: ", input$inMETEQ,sep = ""), sep=", ")
       extended_title <- paste("Scenario - Total Marginal MET hour of population selected for scenario (curently defined as: ", filtered_scenario_title, 
                               ") and selected population (currently defined as: ",filtered_title, ")", sep = "")
       bc <- as.data.frame(bc)
