@@ -19,7 +19,10 @@ variableList <- t(as.matrix(colnames(sdata)))
 variableList <- variableList[,6:length(colnames(sdata))]
 
 scenarios <- c("Trip Mode Share" = "t"
-            ,"Individual METs" =    "i")
+               ,"Individual METs" =    "i")
+
+METSwitchRButton <- c("Baseline and Scenario" = "sep"
+               ,"Baseline versus Scenario" =    "comp")
 
 ag <- "All"
 ag <- append(ag, sort(unique(as.character(tdata$age_group))))
@@ -56,7 +59,7 @@ shinyUI(fluidPage(width="100%", height="100%",
                     ),
                     
                     conditionalPanel(condition="input.conditionedPanels==3",
-#                                      radioButtons("scenario", "Scenario:", scenarios, inline = TRUE),
+                                     #                                      radioButtons("scenario", "Scenario:", scenarios, inline = TRUE),
                                      selectizeInput("bag", "Age Group:", ag, selected = ag[1], multiple = F),
                                      radioButtons("bgender", "Gender: ", gender, inline = TRUE),
                                      selectizeInput("bses", "Socio Economic Classification :", ses, selected = ses[1], multiple = F),
@@ -64,14 +67,25 @@ shinyUI(fluidPage(width="100%", height="100%",
                     ),
                     
                     conditionalPanel(condition="input.conditionedPanels==4",
-#                                      radioButtons("scenario", "Scenario:", scenarios, selected = scenarios[2], inline = TRUE),
+                                     selectInput(inputId = "inMETMS", label = "Select Cycling Multiplier:", choices =  uBDMS),
+                                     selectInput(inputId = "inMETTDR", label = "Select Travel Distance Reduction (TDR):", choices =  uBDTDR, selected = uTDR[length(uTDR)]),
+                                     selectInput(inputId = "inMETEB", label = "Select Ebike (EB):", choices =  uBDEB),
+                                     selectInput(inputId = "inMETEQ", label = "Select Equity (EQ):", choices =  uBDEQ),
+                                     HTML("<hr>"),
                                      selectizeInput("mag", "Age Group:", ag, selected = ag[1], multiple = F),
                                      radioButtons("mgender", "Gender: ", gender, inline = TRUE),
                                      selectizeInput("mses", "Socio Economic Classification :", ses, selected = ses[1], multiple = F),
-                                     selectizeInput("methnicity", "Ethnic Group:", ethnicity, selected = ethnicity[1], multiple = F)
+                                     selectizeInput("methnicity", "Ethnic Group:", ethnicity, selected = ethnicity[1], multiple = F),
+                                     HTML("<hr>"),
+                                     radioButtons("flipMETHG", label = "Flip Histogram:", METSwitchRButton, inline = TRUE)
+                                     
+#                                      selectInput(inputId = "inMETMS", label = h4("Select Cycling Multiplier:"), choices =  uBDMS),
+#                                      selectInput(inputId = "inMETTDR", label = h4("Select Travel Distance Reduction (TDR):"), choices =  uBDTDR, selected = uTDR[length(uTDR)]),
+#                                      selectInput(inputId = "inMETEB", label = h4("Select Ebike (EB):"), choices =  uBDEB),
+#                                      selectInput(inputId = "inMETEQ", label = h4("Select Equity (EQ):"), choices =  uBDEQ)
                     )
                   ),
-
+                  
                   mainPanel(
                     tabsetPanel(
                       tabPanel("Scenarios", value=1,
@@ -89,7 +103,8 @@ shinyUI(fluidPage(width="100%", height="100%",
                                showOutput('plotMode', "highcharts")
                       ), 
                       tabPanel("METs", value=4,
-                               showOutput('plotMET', "highcharts")
+                               showOutput('plotMET', "highcharts"),
+                               showOutput('plotScenarioMET', "highcharts")
                       ),
                       
                       id = "conditionedPanels"
