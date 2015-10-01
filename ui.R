@@ -18,11 +18,15 @@ uBDEB <- sort(unique(msharedtata$ebike))
 variableList <- t(as.matrix(colnames(sdata)))
 variableList <- variableList[,6:length(colnames(sdata))]
 
-scenarios <- c("Trip Mode Share" = "t"
-               ,"Individual METs" =    "i")
+scenarios <- c("Trip Mode Share" = "t",
+               "Individual METs" =    "i")
 
-METSwitchRButton <- c("Baseline and Scenario" = "sep"
-                      ,"Baseline versus Scenario" =    "comp")
+METSwitchRButton <- c("Baseline and Scenario" = "sep",
+                      "Baseline versus Scenario" =    "comp")
+
+phyGLRButton <- c("On" = "on",
+                  "Off" =    "off")
+
 
 ag <- "All"
 ag <- append(ag, sort(unique(as.character(tdata$age_group))))
@@ -76,7 +80,9 @@ shinyUI(fluidPage(width="100%", height="100%",
                                      selectizeInput("mses", "Socio Economic Classification :", ses, selected = ses[1], multiple = F),
                                      selectizeInput("methnicity", "Ethnic Group:", ethnicity, selected = ethnicity[1], multiple = F),
                                      HTML("<hr>"),
-                                     radioButtons("flipMETHG", label = "Flip Histogram:", METSwitchRButton, inline = TRUE)
+                                     radioButtons("flipMETHG", label = "Flip Histogram:", METSwitchRButton, inline = TRUE),
+                                     HTML("<hr>"),
+                                     radioButtons("phyGuideline", label = "% Meeting WHO Physical Guideline", phyGLRButton, selected = phyGLRButton[2], inline = TRUE)
                     )
                   ),
                   
