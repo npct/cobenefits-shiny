@@ -172,7 +172,7 @@ shinyServer(function(input, output, session){
         secondColName <- "Scenario"
       }
       
-      filtered_title <- getMETFilteredTitle(firstColData)
+      filtered_title <- getMETFilteredTitle(secondColData, "baseline")
       
       h1 <- Highcharts$new()
       h1$chart(type = "column")
@@ -195,7 +195,119 @@ shinyServer(function(input, output, session){
         
         if (nrow(firstColData) < 10){
           h1$subtitle(text = HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
+        }else{
+          h1$subtitle(text= filtered_title)
         }
+        
+        h1$yAxis(tickInterval = 20, title = list(text = 'Percentage %'))
+        
+      }else{
+        
+        bc <- as.data.frame(table (cut (firstColData$total_mmet, breaks = c(seq(-4.4,52.8, 4.4), max(firstColData$total_mmet)))))
+        bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
+        bc1max <- max(bc$Freq, na.rm = T)
+        
+        h1$xAxis(categories = as.list(append(c(seq(-4.4,52.8, 4.4))[-1], "52.7+")), title = list(text = 'Marginal MET Hours'))
+        h1$series(data = bc$Freq, name = paste(firstColName, "Population", sep = " "))
+        max_val <- 0
+        if (nrow(secondColData) > 1)
+          max_val <- max(secondColData$total_mmet, na.rm = T)
+        h <- NULL
+        if (max_val <= 52.8){
+          if (max_val >= 4.4){
+            bc <- table (cut (secondColData$total_mmet, breaks = c(seq(min(secondColData$total_mmet) - 4.4, ceiling(max(secondColData$total_mmet) - 4.4), by = 4.4), max(secondColData$total_mmet))))
+          }else{
+            bc <- table (cut (secondColData$total_mmet, breaks = c(-4.4, max(secondColData$total_mmet))))
+          }
+        }
+        else{
+          bc <- table (cut (secondColData$total_mmet, breaks = c(seq(-4.4,52.8, 4.4), max(secondColData$total_mmet))))
+        }
+        
+        bc <- as.data.frame(bc)
+        bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
+        filter <- FALSE
+        if (sum(bc$Freq, na.rm = T) > 10)
+          filter <- TRUE
+        bc2max <- 0
+        if (nrow(as.data.frame(bc)) > 0)
+          bc2max <- max(bc$Freq, na.rm = T)
+        max_y <- max(bc1max, bc2max)
+        h1$yAxis(min = 0, max = max(30, max_y), tickInterval = 10, title = list(text = 'Percentage %'))
+        
+        if(filter){
+          h1$series(data = bc$Freq, name = paste(secondColName, "Population", sep = " "))
+          h1$subtitle(text= filtered_title)
+          
+        }else{
+          h1$subtitle(text = HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
+        }
+      }
+      
+    }
+    
+    h1$title(text = extended_title)
+    h1$tooltip(valueSuffix= '%')
+    h1$set(dom = 'plotMET')
+    h1$exporting(enabled = T)
+    return(h1)
+  })
+  
+  output$plotScenarioMET <- renderChart({
+    
+    plotMETDataTable()
+    if (!is.null(scMETdata)){
+      
+      if (input$flipMETHG == 'sep'){
+        # Keep the data separated
+        # scMETdata and scFilteredMETdata
+        firstColData = scMETdata
+        secondColData = scFilteredMETdata
+        extended_title <- paste("Marginal MET hours of Scenario")
+        
+        firstColName <- "Scenario"
+        secondColName <- "Scenario (Filtered)"
+        
+        
+        
+      }else{
+        # Keep the data mixed
+        firstColData = pd
+        secondColData = scFilteredMETdata
+        extended_title <- paste("Baseline versus Scenario - Marginal MET hour of Filtered Population")
+        
+        firstColName <- "Baseline (Filtered)"
+        secondColName <- "Scenario (Filtered)"
+        
+      }
+      
+      filtered_title <- getMETFilteredTitle(secondColData, "scenario")
+      
+      h1 <- Highcharts$new()
+      h1$chart(type = "column")
+      h1$plotOptions(column=list(animation=FALSE))
+      
+      if (input$phyGuideline == 'on'){
+        bc <- createPhyActTable(firstColData)
+        bc$Freq <- round(bc$Freq  / nrow(firstColData) * 100, digits = 1)
+        
+        h1$xAxis(categories = c("Lower the guidelines (METh < 8.75)", "Meeting the guidelines (METh > 8.75)", 
+                                "Meeting the guidelines (METh > 17.5)"), 
+                 title = list(text = 'Marginal MET Hours'))
+        h1$series(data = bc$Freq, name = paste(firstColName, "Population", sep = " "))
+        
+        bc <- createPhyActTable(secondColData)#$total_mmet)
+        bc$Freq <- round(bc$Freq  / nrow(secondColData) * 100, digits = 1)
+        
+        h1$series(data = bc$Freq, name = paste(secondColName, "Population", sep = " "))
+        
+        if (nrow(firstColData) < 10){
+          h1$subtitle(text = HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
+        }else{
+          h1$subtitle(text= filtered_title)
+        }
+        
+        h1$yAxis(tickInterval = 20, title = list(text = 'Percentage %'))
         
       }else{
         
@@ -234,17 +346,7 @@ shinyServer(function(input, output, session){
         
         if(filter){
           h1$series(data = bc$Freq, name = paste(secondColName, "Population", sep = " "))
-          
-          #           mmet_per_8.75_firstColumn <- round(nrow(subset(firstColData, total_mmet >= 8.75 )) / nrow(firstColData) * 100, digits = 1)
-          #           mmet_per_17.5_firstColumn <- round(nrow(subset(firstColData, total_mmet >= 17.5)) / nrow(firstColData) * 100, digits = 1)
-          #           mmet_per_8.75_secondColumn <- round(nrow(subset(secondColData, total_mmet >= 8.75 )) / nrow(secondColData) * 100, digits = 1)
-          #           mmet_per_17.5_secondColumn <- round(nrow(subset(secondColData, total_mmet >= 17.5)) / nrow(secondColData) * 100, digits = 1)
-          #           
-          #           firstColStr <- paste(firstColName, " marginal MET Hour >= 8.75: ", mmet_per_8.75_firstColumn, "%", " and >= 17.5: ", mmet_per_17.5_firstColumn, "%", sep = "")
-          #           secondColStr <- paste(secondColName, " marginal MET Hour >= 8.75: ", mmet_per_8.75_secondColumn, "%", " and >= 17.5: ", mmet_per_17.5_secondColumn, "%", sep="")
-          #           
-          #           h1$subtitle(text = HTML(paste(firstColStr, "<br>", secondColStr)),
-          #                       style = list(font = 'bold 11px "Trebuchet MS", Verdana, sans-serif'))
+          h1$subtitle(text= filtered_title)
           
         }else{
           h1$subtitle(text = HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
@@ -255,112 +357,10 @@ shinyServer(function(input, output, session){
     
     h1$title(text = extended_title)
     h1$tooltip(valueSuffix= '%')
-    h1$set(dom = 'plotMET')
+    h1$set(dom = 'plotScenarioMET')
     h1$exporting(enabled = T)
     return(h1)
-  })
-  
-  output$plotScenarioMET <- renderChart({
     
-    plotMETDataTable()
-    if (!is.null(scMETdata)){
-      
-      if (input$flipMETHG == 'sep'){
-        # Keep the data separated
-        # scMETdata and scFilteredMETdata
-        firstColData = scMETdata
-        secondColData = scFilteredMETdata
-        extended_title <- paste("Marginal MET hours of Scenario")
-        
-        firstColName <- "Scenario"
-        secondColName <- "Scenario (Filtered)"
-        
-      }else{
-        # Keep the data mixed
-        firstColData = pd
-        secondColData = scFilteredMETdata
-        extended_title <- paste("Baseline versus Scenario - Marginal MET hour of Filtered Population")
-        
-        firstColName <- "Baseline (Filtered)"
-        secondColName <- "Scenario (Filtered)"
-        
-      }
-      
-      filtered_title <- getMETFilteredTitle(firstColData)
-      
-      h1 <- Highcharts$new()
-      h1$legend (text = "test alkj lajds lsakjdasldkjasd lkajdslkasjsd alkdja lksdjaslkdjasld kajdslkjadslkadj la")
-      h1$chart(type = "column")
-      h1$plotOptions(column=list(animation=FALSE))
-      #       h1$addAssets(js = 
-      #                     c("https://code.highcharts.com/modules/exporting.js",
-      #                       "http://highslide-software.github.io/export-csv/export-csv.js"
-      #                     ))
-      
-      bc <- as.data.frame(table (cut (firstColData$total_mmet, breaks = c(seq(-4.4,52.8, 4.4), max(firstColData$total_mmet)))))
-      bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
-      bc1max <- max(bc$Freq, na.rm = T)
-      
-      h1$xAxis(categories = as.list(append(c(seq(-4.4,52.8, 4.4))[-1], "52.7+")), title = list(text = 'Marginal MET Hours'))
-      h1$series(data = bc$Freq, name = paste(firstColName, "Population", sep = " "))
-      max_val <- 0
-      if (nrow(secondColData) > 1)
-        max_val <- max(secondColData$total_mmet, na.rm = T)
-      h <- NULL
-      if (max_val <= 52.8){
-        if (max_val >= 4.4){
-          bc <- table (cut (secondColData$total_mmet, breaks = c(seq(min(secondColData$total_mmet) - 4.4, ceiling(max(secondColData$total_mmet) - 4.4), by = 4.4), max(secondColData$total_mmet))))
-        }else{
-          bc <- table (cut (secondColData$total_mmet, breaks = c(-4.4, max(secondColData$total_mmet))))
-        }
-      }
-      else{
-        bc <- table (cut (secondColData$total_mmet, breaks = c(seq(-4.4,52.8, 4.4), max(secondColData$total_mmet))))
-      }
-      
-      filtered_scenario_title <- paste(paste("Mode Shift: ", input$inMETMS,sep = ""),  paste("Distance Reduction: ", input$inMETTDR,sep = ""),
-                                       paste("Ebike :", input$inMETEB,sep = ""), paste("Equity: ", input$inMETEQ,sep = ""), sep=", ")
-      
-      #(curently defined as: ", filtered_scenario_title, 
-      #                        ") and selected population (currently defined as: ",filtered_title, ")", sep = "")
-      bc <- as.data.frame(bc)
-      bc$Freq <- round(bc$Freq  / sum(bc$Freq) * 100, digits = 1)
-      filter <- FALSE
-      if (sum(bc$Freq, na.rm = T) > 10)
-        filter <- TRUE
-      bc2max <- 0
-      if (nrow(as.data.frame(bc)) > 0)
-        bc2max <- max(bc$Freq, na.rm = T)
-      max_y <- max(bc1max, bc2max)
-      h1$yAxis(min = 0, max = max(30, max_y), tickInterval = 10, title = list(text = 'Percentage %'))
-      
-      if(filter){
-        
-        h1$series(data = bc$Freq, name = paste(secondColName, "Population", sep = " "))
-        
-        #         mmet_per_8.75_firstColumn <- round(nrow(subset(firstColData, total_mmet >= 8.75 )) / nrow(firstColData) * 100, digits = 1)
-        #         mmet_per_17.5_firstColumn <- round(nrow(subset(firstColData, total_mmet >= 17.5)) / nrow(firstColData) * 100, digits = 1)
-        #         mmet_per_8.75_secondColumn <- round(nrow(subset(secondColData, total_mmet >= 8.75 )) / nrow(secondColData) * 100, digits = 1)
-        #         mmet_per_17.5_secondColumn <- round(nrow(subset(secondColData, total_mmet >= 17.5)) / nrow(secondColData) * 100, digits = 1)
-        #         
-        #         firstColStr <- paste(firstColName, " marginal MET Hour >= 8.75: ", mmet_per_8.75_firstColumn, "%", " and >= 17.5: ", mmet_per_17.5_firstColumn, "%", sep = "")
-        #         secondColStr <- paste(secondColName, " marginal MET Hour >= 8.75: ", mmet_per_8.75_secondColumn, "%", " and >= 17.5: ", mmet_per_17.5_secondColumn, "%", sep="")
-        #         
-        #         h1$subtitle(text = HTML(paste(firstColStr, "<br>", secondColStr)),
-        #                     style = list(font = 'bold 11px "Trebuchet MS", Verdana, sans-serif'))
-        
-      }else{
-        h1$subtitle(text = HTML("Sorry: Not Enough Data to Display Selected Population (Population Size &lt; 10)"), style = list(font = 'bold 14px "Trebuchet MS", Verdana, sans-serif', color = "#f00"))
-      }
-      
-      h1$title(text = extended_title)
-      h1$tooltip(valueSuffix= '%')
-      h1$set(dom = 'plotScenarioMET')
-      h1$exporting(enabled = T)
-      
-      #h1$html(chart.getCSV())
-      return(h1)
-    }
   })
   
   output$plotBaseline <- renderChart({
@@ -437,9 +437,14 @@ shinyServer(function(input, output, session){
       filtered_title
   }
   
-  getMETFilteredTitle <- function(data){
+  getMETFilteredTitle <- function(data, src){
     filtered_title <- "total population (baseline)"
-    if (nrow(data) != nrow (pd)){
+    if (src == "baseline")
+      dataSource = idata
+    else
+      dataSource = scMETdata
+    
+    if (nrow(data) != nrow (dataSource)){
       
       displayGender <- "All"
       if (input$mgender == 1){
@@ -472,6 +477,9 @@ shinyServer(function(input, output, session){
       filtered_title
     }else
       filtered_title
+    
+    
+    
   }
   
   
